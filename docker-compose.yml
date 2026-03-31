@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mariadb:10.6
+    container_name: itagi-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: itagi_classificados
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    container_name: itagi-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    # --- ADICIONADO PARA PERSISTÊNCIA ---
+    volumes:
+      - ./backend/uploads:/app/uploads
+    # ------------------------------------
+    environment:
+      - PORT=3000
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=itagi_classificados
+      - JWT_SECRET=minhachavesecreta123456
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_USER=leonegomescoelholeo@gmail.com
+      - EMAIL_PASS=ervdtvxwbnhmibiw
+      - NODE_ENV=development
+    depends_on:
+      - mysql
+
+  frontend:
+    build: ./frontend
+    container_name: itagi-frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

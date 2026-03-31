@@ -1,0 +1,273 @@
+/* src/components/AdCard/AdCard.css */
+
+/* ========================================= */
+/* VARIÁVEIS GLOBAIS (caso não estejam definidas no App.css) */
+/* ========================================= */
+:root {
+  --white: #ffffff;
+  --gray-light: #f5f5f5;
+  --gray: #666666;
+  --gray-dark: #333333;
+  --dark: #1a1a1a;
+  --danger: #f72585;
+  --gradient-1: linear-gradient(135deg, #4361ee, #7209b7);
+  --gradient-2: linear-gradient(135deg, #f72585, #b5179e);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(67, 97, 238, 0.15);
+}
+
+/* ========================================= */
+/* ISOLAMENTO - Estilos do carrossel NÃO devem afetar o AdCard */
+/* ========================================= */
+.carousel .ad-card {
+  all: unset;
+  display: block;
+  width: 100%;
+}
+
+/* ========================================= */
+/* ESTILOS BASE DO ADCARD (FORA DO CARROSSEL) */
+/* ========================================= */
+.ad-card {
+  background: var(--white);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0,0,0,0.05);
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.ad-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Container da imagem - tamanho fixo para consistência */
+.ad-card-image-container {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f7fa, #e9ecef);
+}
+
+.ad-card-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ad-card:hover .ad-card-image-container img {
+  transform: scale(1.1);
+}
+
+/* Badge de destaque */
+.ad-card-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: linear-gradient(135deg, #f72585, #b5179e);
+  color: var(--white);
+  padding: 6px 15px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 2;
+  box-shadow: 0 4px 15px rgba(247, 37, 133, 0.4);
+}
+
+/* Conteúdo do card */
+.ad-card-content {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ad-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin: 0 0 8px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ad-card-price {
+  background: linear-gradient(135deg, #4361ee, #7209b7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.ad-card-footer {
+  border-top: 2px solid var(--gray-light);
+  margin-top: auto;
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ad-card-location {
+  color: var(--gray);
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ad-card-location::before {
+  content: '📍';
+  font-size: 1rem;
+}
+
+/* ========================================= */
+/* AJUSTES PARA GRADE DE ANÚNCIOS (Home) */
+/* ========================================= */
+.ads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 20px 0;
+}
+
+.ads-grid .ad-card {
+  max-width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+/* ========================================= */
+/* AJUSTES PARA O CARROSSEL - IMAGENS GIGANTES (2/3 DO CARD) */
+/* ========================================= */
+
+/* DESKTOP - Carrossel */
+@media (min-width: 769px) {
+  .carousel .ad-card {
+    min-width: 340px;
+    max-width: 380px;
+    height: 520px;
+    margin: 0;
+  }
+
+  .carousel .ad-card-image-container {
+    height: 66%; /* 2/3 do card */
+    width: 100%;
+  }
+
+  .carousel .ad-card-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .carousel .ad-card-content {
+    height: 34%; /* 1/3 do card */
+    padding: 20px;
+  }
+
+  .carousel .ad-card-title {
+    font-size: 1.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .carousel .ad-card-price {
+    font-size: 2rem;
+  }
+
+  .carousel .ad-card-footer {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  /* Esconder elementos desnecessários no carrossel */
+  .carousel .ad-card-views,
+  .carousel .ad-card-badge {
+    display: none;
+  }
+}
+
+/* MOBILE - Carrossel */
+@media (max-width: 768px) {
+  .carousel .ad-card {
+    min-width: 260px;
+    max-width: 280px;
+    height: 420px;
+    margin: 0 auto;
+  }
+
+  .carousel .ad-card-image-container {
+    height: 66%;
+    width: 100%;
+  }
+
+  .carousel .ad-card-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .carousel .ad-card-content {
+    height: 34%;
+    padding: 15px;
+  }
+
+  .carousel .ad-card-title {
+    font-size: 1.1rem;
+  }
+
+  .carousel .ad-card-price {
+    font-size: 1.5rem;
+  }
+
+  .carousel .ad-card-footer {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .carousel .ad-card-views,
+  .carousel .ad-card-badge {
+    display: none;
+  }
+}
+
+/* Celulares muito pequenos */
+@media (max-width: 480px) {
+  .carousel .ad-card {
+    min-width: 220px;
+    max-width: 240px;
+    height: 380px;
+  }
+
+  .carousel .ad-card-price {
+    font-size: 1.3rem;
+  }
+}
+
+/* ========================================= */
+/* ESTADOS VAZIOS E CARREGAMENTO */
+/* ========================================= */
+.ad-card-placeholder {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

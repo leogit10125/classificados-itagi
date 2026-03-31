@@ -1,0 +1,109 @@
+/* Container Principal */
+.meus-anuncios-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  min-height: 70vh;
+}
+
+.meus-anuncios-container h2 {
+  color: #333;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #4361ee;
+  padding-bottom: 10px;
+  display: inline-block;
+}
+
+/* Grid de Listagem */
+.lista-meus-anuncios {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Card do Anúncio */
+.item-anuncio {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.item-anuncio:hover {
+  transform: translateY(-2px);
+}
+
+/* Miniatura da Imagem */
+.item-anuncio img {
+  width: 100px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 20px;
+  background: #f0f0f0;
+}
+
+/* Informações do Texto */
+.item-anuncio .info {
+  flex-grow: 1;
+}
+
+.item-anuncio .info h4 {
+  margin: 0 0 5px 0;
+  color: #222;
+  font-size: 18px;
+}
+
+.item-anuncio .info .preco {
+  color: #4361ee;
+  font-weight: bold;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Botão de Excluir */
+.btn-delete {
+  background-color: #ef233c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-delete:hover {
+  background-color: #d90429;
+}
+
+/* Estado Vazio */
+.meus-anuncios-container p {
+  color: #666;
+  font-style: italic;
+}
+
+/* Responsividade para Celular */
+@media (max-width: 600px) {
+  .item-anuncio {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .item-anuncio img {
+    margin: 0 0 15px 0;
+    width: 100%;
+    height: 150px;
+  }
+
+  .item-anuncio .info {
+    margin-bottom: 15px;
+  }
+
+  .btn-delete {
+    width: 100%;
+  }
+}

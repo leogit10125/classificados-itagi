@@ -1,0 +1,326 @@
+/* src/pages/Anunciar/Anunciar.css */
+
+/* Container principal */
+.anunciar-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Título */
+.anunciar-title {
+  color: #4361ee;
+  margin-bottom: 30px;
+}
+
+/* Formulário */
+.anunciar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Grupo de formulário */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Inputs e textarea */
+.form-input,
+.form-textarea,
+.form-select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Select específico */
+.form-select {
+  background-color: white;
+  cursor: pointer;
+}
+
+.form-select:focus,
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #4361ee;
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+}
+
+/* Container de preview das imagens */
+.preview-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+/* Imagens de preview */
+.preview-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #4361ee;
+}
+
+/* Botão de submit */
+.submit-button {
+  background-color: #4361ee;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s, opacity 0.3s;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #3046c0;
+}
+
+.submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Seção de imagens (mantendo os estilos adicionais que você mostrou) */
+.form-section {
+  margin-bottom: 40px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.form-section h3 {
+  color: #1e1e2f;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+}
+
+.section-hint {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.image-upload-container {
+  margin-top: 10px;
+}
+
+.image-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.image-preview-item {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e9ecef;
+}
+
+.image-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-image {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.3s;
+}
+
+.remove-image:hover {
+  background: rgba(247, 37, 133, 0.8);
+  transform: scale(1.1);
+}
+
+.image-upload-button {
+  width: 120px;
+  height: 120px;
+  border: 2px dashed #ced4da;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: white;
+}
+
+.image-upload-button:hover {
+  border-color: #f72585;
+  background: #f8f9fa;
+}
+
+.image-upload-button span {
+  color: #495057;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Seção de destaque */
+.highlight-section {
+  background: linear-gradient(135deg, #fff3e0, #ffe0e0);
+  border: 2px solid #ffd166;
+}
+
+.highlight-options {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.highlight-option {
+  flex: 1;
+  min-width: 200px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+
+.highlight-option:hover {
+  border-color: #f72585;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(247, 37, 133, 0.1);
+}
+
+.highlight-option input[type="radio"] {
+  margin-right: 10px;
+}
+
+.highlight-option strong {
+  display: block;
+  color: #f72585;
+  font-size: 1.1rem;
+}
+
+.highlight-option small {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.disabled-input {
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.disabled-input:focus {
+  outline: none;
+  border-color: #eaeaea;
+}
+
+/* Media queries para responsividade */
+@media (max-width: 768px) {
+  .anunciar-container {
+    padding: 15px;
+  }
+  
+  .image-preview-item,
+  .image-upload-button {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .highlight-options {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .highlight-option {
+    min-width: auto;
+  }
+}
+/* Adicione no final do arquivo Anunciar.css */
+
+/* Estilo para o hint de localização */
+.location-hint {
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+/* Estilo para os optgroups */
+select optgroup {
+  font-weight: bold;
+  color: #4361ee;
+  background-color: #f8f9fa;
+}
+
+select optgroup option {
+  font-weight: normal;
+  color: #333;
+  padding: 8px;
+}
+
+/* Hover nos options */
+select option:hover {
+  background-color: #4361ee;
+  color: white;
+}
+
+/* Estilo para quando o select está focado */
+select:focus option:checked {
+  background-color: #4361ee;
+  color: white;
+}
+
+/* Melhorias visuais para o select */
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  select optgroup {
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,96 @@
+/* ===================================== */
+/* INDEX.CSS - APENAS CONFIGURAÇÕES GLOBAIS */
+/* NADA DE ESTILOS DE COMPONENTES AQUI! */
+/* ===================================== */
+
+/* Importação de fontes */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Variáveis globais - só cores e medidas padrão */
+/* Variáveis de cores no :root (adicionar no index.css) */
+:root {
+  --primary: #4361ee;      /* Azul vibrante (principal) */
+  --primary-dark: #3a56d4;  /* Azul escuro */
+  --secondary: #06d6a0;     /* Verde menta (secundário) */
+  --accent: #ffd166;         /* Amarelo suave (destaques) */
+  --danger: #ef476f;         /* Rosa/vermelho (preços) */
+  
+  --dark: #2b2d42;           /* Azul muito escuro (textos) */
+  --gray-dark: #4a4e69;      /* Cinza escuro */
+  --gray: #8d99ae;           /* Cinza médio */
+  --gray-light: #edf2f4;     /* Cinza claro (fundos) */
+  --white: #ffffff;          /* Branco */
+  
+  --success: #06d6a0;        /* Verde para sucesso */
+  --warning: #ffd166;         /* Amarelo para avisos */
+  --info: #4361ee;            /* Azul para informações */
+}
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--light);
+  color: var(--dark);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Container padrão para centralizar conteúdo */
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
+/* Utilitários de grid - apenas estrutura, sem estilos de cards */
+.grid {
+  display: grid;
+  gap: 24px;
+}
+
+/* Animações globais */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===================================== */
+/* 🚫 NÃO COLOCAR NADA ESPECÍFICO DE COMPONENTES AQUI! */
+/* ===================================== */
+
+/* 
+❌ NÃO colocar:
+   - .hero { ... }
+   - .ad-card { ... }
+   - .menu { ... }
+   - .categories { ... }
+   
+✅ Cada componente tem SEU próprio CSS
+*/

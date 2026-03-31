@@ -1,0 +1,145 @@
+/* src/components/Header/Header.css */
+.header {
+  background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+  color: rgb(214, 130, 130);
+  padding: 30px 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header-content {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.logo-area {
+  margin-bottom: 10px;
+}
+
+.logo-area h1 {
+  font-size: 48px;
+  margin: 0;
+  font-weight: 800;
+  display: inline;
+  color: white;
+}
+
+.logo-area span {
+  font-size: 24px;
+  margin-left: 10px;
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+.slogan {
+  font-size: 18px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Busca */
+.search-container {
+  max-width: 600px;
+  margin: 0 auto 30px;
+  display: flex;
+  gap: 10px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.search-input:focus {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.search-button {
+  background: #130404;
+  color: rgb(29, 28, 28);
+  border: none;
+  padding: 0 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.search-button:hover {
+  background: #1f0f0f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+/* Estatísticas */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-item strong {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.stat-item span {
+  font-size: 14px;
+  opacity: 0.8;
+  letter-spacing: 1px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .logo-area h1 {
+    font-size: 32px;
+    display: block;
+  }
+  
+  .logo-area span {
+    font-size: 18px;
+    margin-left: 0;
+    display: block;
+  }
+  
+  .slogan {
+    font-size: 14px;
+    padding: 0 20px;
+  }
+  
+  .search-container {
+    flex-direction: column;
+    margin: 0 20px 30px;
+  }
+  
+  .search-button {
+    padding: 12px;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .stat-item strong {
+    font-size: 24px;
+  }
+}

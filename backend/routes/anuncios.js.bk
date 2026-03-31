@@ -1,0 +1,13 @@
+const express = require('express');
+const router = express.Router();
+const anunciosController = require('../controllers/anuncios-controller');
+const upload = require('../middleware/upload'); 
+const auth = require('../middleware/auth'); // Certifique-se de ter este arquivo
+
+router.get('/', anunciosController.listarAnuncios);
+router.get('/:id', anunciosController.buscarAnuncio);
+
+// ATUALIZADO: Com auth para garantir que req.usuarioId exista
+router.post('/', auth, upload.array('imagens', 5), anunciosController.criarAnuncio);
+
+module.exports = router;

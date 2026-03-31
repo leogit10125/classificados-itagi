@@ -1,0 +1,277 @@
+/* src/components/Categories/Categories.css */
+
+.categories {
+  padding: 80px 0;
+  background: var(--white);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.categories-title {
+  text-align: center;
+  margin-bottom: 50px;
+  font-size: 2.5rem;
+}
+
+.categories-title span {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+
+.categories-title strong {
+  font-size: 2.8rem;
+  color: var(--dark);
+  position: relative;
+  display: inline-block;
+}
+
+.categories-title strong::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: var(--gradient-1);
+  border-radius: 2px;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 25px;
+}
+
+.category-card {
+  text-align: center;
+  padding: 30px 20px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid var(--gray-light);
+}
+
+.category-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-md);
+  border-color: transparent;
+}
+
+.category-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 2.5rem;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover .category-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.category-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--dark);
+}
+
+.category-count {
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+/* Cores específicas para cada categoria (opcional) */
+.category-card[data-category="vendas"]:hover .category-icon {
+  background: linear-gradient(135deg, #f97316, #fb923c);
+}
+
+.category-card[data-category="serviços"]:hover .category-icon {
+  background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.category-card[data-category="imóveis"]:hover .category-icon {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+}
+
+.category-card[data-category="empregos"]:hover .category-icon {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+}
+
+.category-card[data-category="veículos"]:hover .category-icon {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+.category-card[data-category="eletrônicos"]:hover .category-icon {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .categories {
+    padding: 40px 0;
+  }
+
+  .categories h2 {
+    font-size: 1.6rem;
+    margin-bottom: 30px;
+    padding-left: 30px;
+  }
+
+  .categories h2::before {
+    font-size: 1.4rem;
+    left: -2px;
+  }
+
+  .categories h2::after {
+    left: 30px;
+    width: 60px;
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .category-card {
+    padding: 20px 12px;
+    min-height: 120px;
+  }
+
+  .category-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .category-name {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .categories-grid {
+    gap: 12px;
+  }
+
+  .category-card {
+    padding: 16px 8px;
+    min-height: 100px;
+  }
+
+  .category-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .category-name {
+    font-size: 0.85rem;
+  }
+}
+/* src/components/Categories/Categories.css */
+.categories-section {
+  padding: 40px 0;
+  background: #f8f9fa;
+}
+
+.categories-section h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.category-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(56, 82, 194, 0.2);
+  background: #8e3ecf;
+}
+
+.category-card:hover .category-icon,
+.category-card:hover .category-name,
+.category-card:hover .category-count {
+  color: white;
+}
+
+.category-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.category-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.category-count {
+  font-size: 14px;
+  color: #666;
+  background: #f0f0f0;
+  padding: 4px 12px;
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+
+.category-card:hover .category-count {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .category-card {
+    padding: 20px 10px;
+  }
+  
+  .category-icon {
+    font-size: 36px;
+  }
+  
+  .category-name {
+    font-size: 16px;
+  }
+}

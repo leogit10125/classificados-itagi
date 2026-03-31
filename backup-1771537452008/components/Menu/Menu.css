@@ -1,0 +1,302 @@
+/* src/components/Menu/Menu.css */
+
+.menu {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.menu-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.8rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+/* Logo */
+.menu-logo a {
+  text-decoration: none;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.menu-logo h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff, #ffd166);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.menu-logo span {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Menu Items - Desktop */
+.menu-items {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.menu-items > li {
+  position: relative;
+}
+
+.menu-items > li > a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.menu-items > li > a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.menu-items > li > a i {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.menu-items > li:hover > a i {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  background: white;
+  border-radius: 16px;
+  padding: 0.8rem 0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.menu-items > li:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(5px);
+}
+
+.dropdown-menu li {
+  list-style: none;
+}
+
+.dropdown-menu a {
+  color: #1e293b;
+  text-decoration: none;
+  padding: 0.7rem 1.5rem;
+  display: block;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  position: relative;
+}
+
+.dropdown-menu a:hover {
+  background: linear-gradient(90deg, #f8fafc, #ffffff);
+  color: #667eea;
+  padding-left: 2rem;
+}
+
+.dropdown-menu a::before {
+  content: '→';
+  position: absolute;
+  left: 0.8rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+  color: #667eea;
+}
+
+.dropdown-menu a:hover::before {
+  opacity: 1;
+  left: 1rem;
+}
+
+/* Categorias no dropdown com ícones */
+.dropdown-menu[data-category="vendas"] a::before { content: '🏷️'; }
+.dropdown-menu[data-category="servicos"] a::before { content: '🔧'; }
+.dropdown-menu[data-category="imoveis"] a::before { content: '🏠'; }
+.dropdown-menu[data-category="empregos"] a::before { content: '💼'; }
+.dropdown-menu[data-category="veiculos"] a::before { content: '🚗'; }
+.dropdown-menu[data-category="eletronicos"] a::before { content: '📱'; }
+
+/* Botão Anunciar Destaque */
+.btn-anunciar {
+  background: linear-gradient(135deg, #ffd166, #ffb347) !important;
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  padding: 0.8rem 1.8rem !important;
+  border-radius: 30px !important;
+  box-shadow: 0 4px 15px rgba(255, 209, 102, 0.4);
+  margin-left: 0.5rem;
+}
+
+.btn-anunciar:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(255, 209, 102, 0.6) !important;
+  background: linear-gradient(135deg, #ffb347, #ff9f1c) !important;
+}
+
+/* Mobile Styles */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 100;
+}
+
+.hamburger span {
+  width: 100%;
+  height: 3px;
+  background-color: white;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+  .menu-container {
+    padding: 1rem;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .menu-items {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 350px;
+    height: 100vh;
+    background: white;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 5rem 1.5rem 2rem;
+    transition: right 0.3s ease;
+    box-shadow: -5px 0 30px rgba(0,0,0,0.15);
+    z-index: 99;
+    gap: 0.5rem;
+    align-items: stretch;
+    overflow-y: auto;
+  }
+
+  .menu-items.mobile.open {
+    right: 0;
+  }
+
+  .menu-items > li > a {
+    color: #1e293b;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 0;
+  }
+
+  .menu-items > li > a:hover {
+    background: #f8fafc;
+    transform: none;
+  }
+
+  /* Dropdown no mobile */
+  .dropdown-menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    padding: 0 0 0 1rem;
+    min-width: auto;
+    background: transparent;
+    border: none;
+    display: none;
+  }
+
+  .menu-items > li.active .dropdown-menu {
+    display: block;
+  }
+
+  .dropdown-menu a {
+    color: #4a4e69;
+    padding: 0.8rem 1rem;
+  }
+
+  .dropdown-menu a:hover {
+    background: #f1f5f9;
+    padding-left: 1.5rem;
+  }
+
+  .btn-anunciar {
+    margin: 1rem 0 0 !important;
+    text-align: center;
+    color: white !important;
+  }
+
+  .menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 98;
+    animation: fadeIn 0.3s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
