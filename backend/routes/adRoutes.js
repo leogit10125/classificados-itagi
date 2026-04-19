@@ -58,8 +58,57 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ✅ NOVA ROTA: BUSCAR ANÚNCIOS DE UM USUÁRIO ESPECÍFICO
-// Esta rota destrava o "Carregando..." da sua página Meus Anúncios
+// ✅ ROTA PARA "MEUS ANÚNCIOS" (NOVA)
+router.get('/meus-anuncios', authMiddleware, async (req, res) => {
+  try {
+    console.log('🔍 Buscando anúncios do usuário logado...');
+    console.log('👤 Usuário ID:', req.usuario?.id);
+    
+    const usuarioId = req.usuario?.id;
+    
+    if (!usuarioId) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Usuário não autenticado',
+        anuncios: [] 
+      });
+    }
+
+    const query = `
+      SELECT a.*, u.nome as usuario_nome, u.telefone, u.email
+      FROM anuncios a
+      LEFT JOIN usuarios u ON a.usuario_id = u.id
+      WHERE a.usuario_id = ?
+      ORDER BY a.created_at DESC
+    `;
+    
+    const anuncios = await db.query(query, [usuarioId]);
+    
+    console.log(`✅ Encontrados ${anuncios.length} anúncios`);
+    
+    const anunciosProcessados = anuncios.map(ad => ({
+      ...ad,
+      preco: parseFloat(ad.preco) || 0,
+      imagens: processarImagens(ad.imagens)
+    }));
+    
+    res.json({
+      success: true,
+      anuncios: anunciosProcessados,
+      total: anunciosProcessados.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Erro ao buscar meus anúncios:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Erro ao carregar seus anúncios',
+      anuncios: [] 
+    });
+  }
+});
+
+// BUSCAR ANÚNCIOS DE UM USUÁRIO ESPECÍFICO
 router.get('/usuario/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
@@ -152,9 +201,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     const imagensParaDeletar = processarImagens(ad.imagens);
     
     imagensParaDeletar.forEach(nomeArquivo => {
-      // No Docker, a pasta uploads costuma estar na raiz do projeto backend
       const caminhoFisico = path.join(__dirname, '..', 'uploads', nomeArquivo);
-      
       if (fs.existsSync(caminhoFisico)) {
         fs.unlink(caminhoFisico, (err) => {
           if (err) console.error(`❌ Erro ao apagar arquivo ${nomeArquivo}:`, err);
