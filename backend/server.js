@@ -6,6 +6,9 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'seu-segredo-super-secreto-2024';
+
 // =====================================
 // CONFIGURAÇÃO INICIAL
 // =====================================
@@ -33,6 +36,8 @@ const authRoutes = require('./routes/authRoutes');
 const adRoutes = require('./routes/adRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
+const pacotesRoutes = require('./routes/pacotesRoutes');
+const passwordRoutes = require('./routes/passwordRoutes');
 
 // =====================================
 // MIDDLEWARES
@@ -82,29 +87,55 @@ if (statsRoutes && typeof statsRoutes === 'function') {
     console.log('✅ Rota /api/stats carregada');
 }
 
+// ROTA DE PACOTES
+if (pacotesRoutes && typeof pacotesRoutes === 'function') {
+    app.use('/api/pacotes', pacotesRoutes);
+    console.log('✅ Rota /api/pacotes carregada');
+}
+
+// ROTA DE RECUPERAÇÃO DE SENHA
+if (passwordRoutes && typeof passwordRoutes === 'function') {
+    app.use('/api/password', passwordRoutes);
+    console.log('✅ Rota /api/password carregada');
+}
+
 // =====================================
-// ROTA DE LOGIN (UNIFICADA)
+// ROTA DE LOGIN (CORRIGIDA COM ASYNC/AWAIT)
 // =====================================
-app.post('/api/login', (req, res) => {
+// =====================================
+// ROTA DE LOGIN (CORRIGIDA)
+// =====================================
+// =====================================
+// ROTA DE LOGIN (COM JWT)
+// =====================================
+app.post('/api/login', async (req, res) => {
   const { email, senha } = req.body;
   console.log('📝 Tentativa de login:', email);
   
-  const query = 'SELECT id, nome, email, telefone FROM usuarios WHERE email = ? AND senha = ?';
-  
-  db.query(query, [email, senha], (err, results) => {
-    if (err) {
-      console.error('❌ Erro na consulta:', err);
-      return res.status(500).json({ error: 'Erro interno do servidor' });
-    }
+  try {
+    const users = await db.query('SELECT id, nome, email, telefone FROM usuarios WHERE email = ? AND senha = ?', [email, senha]);
     
-    if (results.length > 0) {
+    if (users.length > 0) {
+      const user = users[0];
+      
+      // Gerar token JWT
+      const token = jwt.sign(
+        { id: user.id, email: user.email, nome: user.nome },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+      
       console.log('✅ Login bem sucedido:', email);
-      const token = Buffer.from(`${email}:${Date.now()}`).toString('base64');
       
       res.json({ 
         success: true, 
         message: 'Login realizado com sucesso!',
-        user: results[0],
+        user: {
+          id: user.id,
+          nome: user.nome,
+          email: user.email,
+          telefone: user.telefone
+        },
         token: token
       });
     } else {
@@ -114,7 +145,13 @@ app.post('/api/login', (req, res) => {
         error: 'Email ou senha inválidos' 
       });
     }
-  });
+  } catch (error) {
+    console.error('❌ Erro no login:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Erro interno do servidor' 
+    });
+  }
 });
 
 // =====================================
@@ -200,9 +237,8 @@ app.get('/api/test', async (req, res) => {
 });
 
 // =====================================
-// MIDDLEWARE PARA ROTAS NÃO ENCONTRADAS (CORRIGIDO)
+// MIDDLEWARE PARA ROTAS NÃO ENCONTRADAS
 // =====================================
-// IMPORTANTE: Use sem as aspas no '*'
 app.use((req, res) => {
   console.log(`❌ Rota não encontrada: ${req.method} ${req.url}`);
   res.status(404).json({ 
@@ -222,6 +258,9 @@ app.listen(PORT, () => {
   console.log(`   GET  /api/meus-anuncios`);
   console.log(`   GET  /api/status`);
   console.log(`   GET  /api/test`);
+  console.log(`   POST /api/password/recuperar`);
+  console.log(`   POST /api/password/redefinir`);
   console.log(`   /api/ads/*`);
   console.log(`   /api/auth/*`);
+  console.log(`   /api/pacotes/*`);
 });

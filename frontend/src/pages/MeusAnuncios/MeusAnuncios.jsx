@@ -15,20 +15,11 @@ function MeusAnuncios() {
         setLoading(true);
         setError(null);
         
-        console.log('🔍 Usuário logado:', usuario);
-        console.log('🔑 Token existe?', !!token);
-        
-        // Verifica se tem token
         if (!token) {
-          console.log('❌ Token não encontrado');
-          setError('Faça login para ver seus anúncios');
-          setAnuncios([]);
-          setLoading(false);
+          setError('Você precisa estar logado');
           return;
         }
         
-        // Usando a rota CORRETA: /api/ads/meus-anuncios
-        console.log('📡 Chamando API: /api/ads/meus-anuncios');
         const response = await fetch('http://localhost:3000/api/ads/meus-anuncios', {
           method: 'GET',
           headers: {
@@ -37,28 +28,20 @@ function MeusAnuncios() {
           }
         });
         
-        console.log('📡 Status da resposta:', response.status);
-        
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `HTTP ${response.status}`);
+          throw new Error(`HTTP ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('✅ Dados recebidos do backend:', data);
         
-        // A resposta vem no formato: { success: true, anuncios: [...], total: X }
         if (data.success && Array.isArray(data.anuncios)) {
           setAnuncios(data.anuncios);
-        } else if (Array.isArray(data)) {
-          setAnuncios(data);
         } else {
-          console.warn('Formato de resposta inesperado:', data);
           setAnuncios([]);
         }
         
       } catch (err) {
-        console.error("❌ Erro detalhado:", err);
+        console.error("❌ Erro:", err);
         setError(err.message);
         setAnuncios([]);
       } finally {
@@ -67,8 +50,14 @@ function MeusAnuncios() {
     };
 
     carregarMeusAnuncios();
-  }, [token]); // Só depende do token
+  }, [token]);
 
+  // Função para EDITAR anúncio
+  const handleEdit = (id) => {
+    window.location.href = `/editar-anuncio/${id}`;
+  };
+
+  // Função para EXCLUIR anúncio
   const handleDelete = async (id) => {
     if (!window.confirm("Tem certeza que deseja excluir? Esta ação não pode ser desfeita!")) return;
 
@@ -82,12 +71,11 @@ function MeusAnuncios() {
       });
 
       if (response.ok) {
-        // Remove da lista local
         setAnuncios(anuncios.filter(ad => ad.id !== id));
-        alert("Anúncio excluído com sucesso!");
+        alert("✅ Anúncio excluído com sucesso!");
       } else {
         const error = await response.json();
-        alert(`Erro ao excluir: ${error.error || 'Erro desconhecido'}`);
+        alert(`Erro: ${error.error || 'Erro desconhecido'}`);
       }
     } catch (err) {
       console.error("Erro na exclusão:", err);
@@ -98,9 +86,7 @@ function MeusAnuncios() {
   if (loading) {
     return (
       <div className="meus-anuncios-container">
-        <div style={{ textAlign: 'center', padding: '50px' }}>
-          <p>🔄 Carregando seus anúncios...</p>
-        </div>
+        <p>🔄 Carregando seus anúncios...</p>
       </div>
     );
   }
@@ -108,15 +94,8 @@ function MeusAnuncios() {
   if (error) {
     return (
       <div className="meus-anuncios-container">
-        <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>
-          <p>❌ Erro: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            style={{ marginTop: '10px', padding: '8px 16px', cursor: 'pointer' }}
-          >
-            Tentar novamente
-          </button>
-        </div>
+        <p style={{ color: 'red' }}>❌ Erro: {error}</p>
+        <button onClick={() => window.location.reload()}>Tentar novamente</button>
       </div>
     );
   }
@@ -128,12 +107,9 @@ function MeusAnuncios() {
       
       <div className="lista-meus-anuncios">
         {anuncios.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '50px' }}>
+          <div className="sem-anuncios">
             <p>📭 Você ainda não publicou nenhum anúncio.</p>
-            <button 
-              onClick={() => window.location.href = '/criar-anuncio'}
-              style={{ marginTop: '10px', padding: '10px 20px', cursor: 'pointer' }}
-            >
+            <button onClick={() => window.location.href = '/criar-anuncio'}>
               ✨ Criar meu primeiro anúncio
             </button>
           </div>
@@ -145,17 +121,12 @@ function MeusAnuncios() {
                   <img 
                     src={`http://localhost:3000/uploads/${ad.imagens[0]}`}
                     alt={ad.titulo}
-                    style={{ width: '100px', height: '80px', objectFit: 'cover' }}
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/100x80?text=Erro+Imagem';
+                      e.target.src = 'https://via.placeholder.com/100x80?text=Sem+Imagem';
                     }}
                   />
                 ) : (
-                  <img 
-                    src="https://via.placeholder.com/100x80?text=Sem+Imagem" 
-                    alt="Sem imagem"
-                    style={{ width: '100px', height: '80px', objectFit: 'cover' }}
-                  />
+                  <img src="https://via.placeholder.com/100x80?text=Sem+Imagem" alt="Sem imagem" />
                 )}
               </div>
               
@@ -167,13 +138,22 @@ function MeusAnuncios() {
                 <p className="data">📅 {new Date(ad.created_at).toLocaleDateString('pt-BR')}</p>
               </div>
 
-              <button 
-                onClick={() => handleDelete(ad.id)} 
-                className="btn-delete"
-                title="Excluir Anúncio"
-              >
-                🗑️ Excluir
-              </button>
+              <div className="botoes-acao">
+                <button 
+                  onClick={() => handleEdit(ad.id)} 
+                  className="btn-edit"
+                  title="Editar Anúncio"
+                >
+                  ✏️ Editar
+                </button>
+                <button 
+                  onClick={() => handleDelete(ad.id)} 
+                  className="btn-delete"
+                  title="Excluir Anúncio"
+                >
+                  🗑️ Excluir
+                </button>
+              </div>
             </div>
           ))
         )}

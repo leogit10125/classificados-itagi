@@ -1,9 +1,8 @@
 // backend/middleware/auth.js
-const jwt = require('jsonwebtoken');
+const db = require('../config/database-hostinger');
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   try {
-    // Log para debug
     console.log('🔍 Auth middleware - Headers:', req.headers.authorization);
     
     // Pegar token do header
@@ -15,24 +14,35 @@ module.exports = (req, res, next) => {
       return res.status(401).json({ error: 'Acesso negado. Token não fornecido.' });
     }
 
-    console.log('🔍 Token recebido:', token.substring(0, 20) + '...');
-    console.log('🔍 JWT_SECRET:', process.env.JWT_SECRET ? 'Configurado' : 'Não configurado');
+    console.log('🔍 Token recebido:', token.substring(0, 30) + '...');
 
-    // Verificar token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Decodificar token base64 (formato: email:timestamp)
+    const decoded = Buffer.from(token, 'base64').toString();
+    const email = decoded.split(':')[0];
     
-    console.log('✅ Token válido! Usuário ID:', decoded.id);
+    console.log('📧 Email decodificado:', email);
+
+    // Buscar usuário no banco
+    const users = await db.query('SELECT id, nome, email FROM usuarios WHERE email = ?', [email]);
     
-    // ✅ ALTERAÇÃO: Adicionar objeto usuario completo à requisição
+    if (!users || users.length === 0) {
+      console.log('❌ Usuário não encontrado');
+      return res.status(401).json({ error: 'Usuário não encontrado' });
+    }
+    
+    const user = users[0];
+    console.log('✅ Usuário autenticado:', user.nome);
+    
+    // Adicionar usuário à requisição
     req.usuario = {
-      id: decoded.id,
-      email: decoded.email,
-      nome: decoded.nome
+      id: user.id,
+      email: user.email,
+      nome: user.nome
     };
     
     next();
   } catch (error) {
-    console.log('❌ Erro na verificação do token:', error.message);
+    console.error('❌ Erro na verificação do token:', error.message);
     res.status(401).json({ error: 'Token inválido: ' + error.message });
   }
 };

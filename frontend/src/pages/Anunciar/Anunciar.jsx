@@ -1,5 +1,5 @@
 // src/pages/Anunciar/Anunciar.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Anunciar.css";
 
@@ -11,12 +11,17 @@ function Anunciar() {
     descricao: '',
     preco: '',
     categoria: '',
-    localizacao: 'Itagi' // Itagi como padrão
+    localizacao: 'itagi'
   });
   
   const [images, setImages] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  
+  // NOVOS STATES PARA LIMITE DE ANÚNCIOS
+  const [creditInfo, setCreditInfo] = useState(null);
+  const [showPacotes, setShowPacotes] = useState(false);
+  const [pacotes, setPacotes] = useState([]);
 
   // Lista completa de cidades da região e povoados de Itagi
   const localizacoes = [
@@ -66,11 +71,77 @@ function Anunciar() {
     { value: 'zumbi', label: 'Zumbi' }
   ];
 
-  // Agrupar localizações por categoria para melhor organização visual
+  // Agrupar localizações por categoria
   const localizacoesAgrupadas = {
-    cidades: localizacoes.slice(0, 16), // Primeiras 16 são as cidades
-    povoados: localizacoes.slice(16) // Restante são povoados
+    cidades: localizacoes.slice(0, 16),
+    povoados: localizacoes.slice(16)
   };
+
+  // NOVA FUNÇÃO: Carregar informações de créditos
+  const carregarCreditos = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    try {
+      const response = await fetch('http://localhost:3000/api/pacotes/creditos', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCreditInfo(data);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar créditos:', err);
+    }
+  };
+
+  // NOVA FUNÇÃO: Carregar pacotes
+  const carregarPacotes = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/pacotes');
+      const data = await response.json();
+      setPacotes(data);
+    } catch (err) {
+      console.error('Erro ao carregar pacotes:', err);
+    }
+  };
+
+  // NOVA FUNÇÃO: Comprar pacote
+  const comprarPacote = async (pacote) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('http://localhost:3000/api/pacotes/comprar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          pacoteId: pacote.id,
+          quantidade: pacote.quantidade,
+          valor: pacote.preco
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(result.message);
+        setShowPacotes(false);
+        await carregarCreditos(); // Recarregar créditos
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Erro ao processar compra');
+      }
+    } catch (err) {
+      console.error('Erro na compra:', err);
+      alert('Erro de conexão');
+    }
+  };
+
+  // Carregar créditos ao montar o componente
+  useEffect(() => {
+    carregarCreditos();
+  }, []);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -103,6 +174,19 @@ function Anunciar() {
         return;
       }
 
+      // VERIFICAR SE TEM CRÉDITOS DISPONÍVEIS
+      if (creditInfo) {
+        const temGratuito = creditInfo.anunciosGratuitosRestantes > 0;
+        const temPago = creditInfo.creditosPagosDisponiveis > 0;
+        
+        if (!temGratuito && !temPago) {
+          await carregarPacotes();
+          setShowPacotes(true);
+          setLoading(false);
+          return;
+        }
+      }
+
       const formDataObj = new FormData();
       formDataObj.append('titulo', formData.titulo);
       formDataObj.append('descricao', formData.descricao);
@@ -127,12 +211,20 @@ function Anunciar() {
       const result = await response.json();
       console.log('📥 Resposta:', result);
       
+      // VERIFICAR SE PRECISA PAGAR (status 402)
+      if (response.status === 402) {
+        setPacotes(result.pacotes || []);
+        setShowPacotes(true);
+        setLoading(false);
+        return;
+      }
+      
       if (!response.ok) {
         throw new Error(result.error || result.message || 'Erro ao criar anúncio');
       }
       
-      alert('✅ Anúncio criado com sucesso!');
-      navigate('/');
+      alert(result.mensagem || '✅ Anúncio criado com sucesso!');
+      navigate('/meus-anuncios');
       
     } catch (error) {
       console.error('❌ Erro:', error);
@@ -148,15 +240,41 @@ function Anunciar() {
     { value: 'imoveis', label: 'Imóveis' },
     { value: 'empregos', label: 'Empregos' },
     { value: 'veiculos', label: 'Veículos' },
-    { value: 'eletronicos', label: 'Eletrônicos' }
+    { value: 'eletronicos', label: 'Eletrônicos' },
+    { value: 'eletrodomesticos', label: 'Eletrodomésticos' },
+    { value: 'informatica', label: 'Informática' },
+    { value: 'moda', label: 'Moda' },
+    { value: 'esportes', label: 'Esportes' },
+    { value: 'outros', label: 'Outros' }
+    
   ];
 
   return (
     <div className="anunciar-container">
       <h2 className="anunciar-title">Criar Novo Anúncio</h2>
       
+      {/* NOVO: Exibir informações de créditos */}
+      {creditInfo && (
+        <div className="credit-info-container">
+          <div className="credit-card gratuitos">
+            <span>🎁 Gratuitos</span>
+            <strong>{creditInfo.anunciosGratuitosRestantes}</strong>
+            <small>restante(s)</small>
+          </div>
+          <div className="credit-card pagos">
+            <span>💰 Pagos</span>
+            <strong>{creditInfo.creditosPagosDisponiveis}</strong>
+            <small>disponível(is)</small>
+          </div>
+          {creditInfo.anunciosGratuitosRestantes === 0 && creditInfo.creditosPagosDisponiveis === 0 && (
+            <div className="credit-warning">
+              ⚠️ Você atingiu o limite de anúncios gratuitos. Adquira um pacote!
+            </div>
+          )}
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} className="anunciar-form">
-        
         <div className="form-group">
           <label>Título:</label>
           <input
@@ -266,9 +384,37 @@ function Anunciar() {
           disabled={loading}
           className="submit-button"
         >
-          {loading ? 'Enviando anúncio e imagens...' : 'Criar Anúncio'}
+          {loading ? 'Enviando anúncio...' : '📢 Publicar Anúncio'}
         </button>
       </form>
+
+      {/* NOVO: Modal de Pacotes */}
+      {showPacotes && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>💰 Adquirir Pacote de Anúncios</h2>
+            <p>Você já usou seus 2 anúncios gratuitos. Escolha um pacote:</p>
+            
+            <div className="packages-grid">
+              {pacotes.map(pacote => (
+                <div key={pacote.id} className="package-card">
+                  <h3>{pacote.nome}</h3>
+                  <p className="quantity">{pacote.quantidade} anúncios</p>
+                  <p className="price">R$ {pacote.preco.toFixed(2)}</p>
+                  {pacote.destaque && <span className="badge">⭐ Destaque</span>}
+                  <button onClick={() => comprarPacote(pacote)}>
+                    Comprar
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            <button className="close-modal" onClick={() => setShowPacotes(false)}>
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

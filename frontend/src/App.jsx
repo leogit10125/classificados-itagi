@@ -8,6 +8,7 @@ import CategoryPage from "./pages/CategoryPage"
 import AdDetail from "./pages/AdDetail"
 import Anunciar from "./pages/Anunciar"
 import SearchResults from './pages/SearchResults/SearchResults';
+import EditarAnuncio from './pages/EditarAnuncio';
 
 // ✅ IMPORTANTE: Importar a nova página de gerenciamento
 import MeusAnuncios from "./pages/MeusAnuncios/MeusAnuncios"; 
@@ -15,6 +16,8 @@ import MeusAnuncios from "./pages/MeusAnuncios/MeusAnuncios";
 // Auth
 import Login from "./pages/Auth/Login"
 import Registro from "./pages/Auth/Registro"
+import RecuperarSenha from "./pages/RecuperarSenha" // Recuperar senha
+import RedefinirSenha from "./pages/RedefinirSenha" // NOVA: Redefinir senha
 
 // Institucional
 import Sobre from "./pages/institucional/Sobre"
@@ -42,13 +45,16 @@ function App() {
         <Route path="/anuncio/:id" element={<AdDetail />} />
         <Route path="/anunciar" element={<Anunciar />} />
         <Route path="/buscar" element={<SearchResults />} />
+        <Route path="/editar-anuncio/:id" element={<EditarAnuncio />} />
         
-        {/* ✅ NOVA ROTA: Onde o usuário deleta seus anúncios */}
+        {/* ✅ ROTA: Onde o usuário gerencia seus anúncios */}
         <Route path="/meus-anuncios" element={<MeusAnuncios />} /> 
         
         {/* Autenticação */}
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
+        <Route path="/recuperar-senha" element={<RecuperarSenha />} /> {/* Recuperar senha */}
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} /> {/* ✅ NOVA: Redefinir senha */}
         
         {/* Institucional */}
         <Route path="/sobre" element={<Sobre />} />
