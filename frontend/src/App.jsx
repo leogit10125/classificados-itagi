@@ -4,6 +4,7 @@ import Menu from "./components/Menu/Menu"
 import Header from "./components/Header/Header" 
 import Footer from "./components/Footer/Footer"
 import Home from "./pages/Home"
+import ScrollToTop from "./components/ScrollToTop"; // ✅ Importado
 import CategoryPage from "./pages/CategoryPage"
 import AdDetail from "./pages/AdDetail"
 import Anunciar from "./pages/Anunciar"
@@ -33,6 +34,9 @@ import Categoria from "./pages/Blog/Categoria"
 function App() {
   return (
     <>
+      {/* ✅ ScrollToTop - Garante que cada página comece no topo */}
+      <ScrollToTop />
+      
       {/* O Menu (que faz o papel de Navbar) aparece em todas as páginas */}
       <Menu />
       
@@ -53,8 +57,8 @@ function App() {
         {/* Autenticação */}
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/recuperar-senha" element={<RecuperarSenha />} /> {/* Recuperar senha */}
-        <Route path="/redefinir-senha" element={<RedefinirSenha />} /> {/* ✅ NOVA: Redefinir senha */}
+        <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         
         {/* Institucional */}
         <Route path="/sobre" element={<Sobre />} />

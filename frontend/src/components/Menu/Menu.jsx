@@ -56,8 +56,8 @@ function Menu() {
         {/* Logo */}
         <div className="menu-logo">
           <Link to="/" onClick={closeMenu}>
-            <h1>Itagi</h1>
-            <span>Classificados</span>
+            <h1>Itagiclassificados.com</h1>
+            
           </Link>
         </div>
 

@@ -5,11 +5,11 @@
   min-height: 400px;
   background: url('/images/hero-bg.jpg') center/cover no-repeat;
   display: flex;
-  border-radius: 30px;
+  border-radius: 15px;
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: var(--white);
+  
   overflow: hidden;
   
 }
@@ -63,11 +63,12 @@
 
 .hero-title-sub {
   display: block;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 400;
-  letter-spacing: 8px;
+  letter-spacing: 6px;
   text-transform: uppercase;
-  margin-top: 10px;
+  margin-top: 8px;
+  text-align: center;
   color: rgba(255,255,255,0.9);
 }
 
@@ -78,6 +79,7 @@
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  text-align: center;
 }
 
 .hero-search {
@@ -98,6 +100,10 @@
   border-radius: 60px 0 0 60px;
   outline: none;
 }
+.hero-search-input::placeholder {
+  color: rgba(193, 19, 19, 0.4); /* cinza mais claro e apagado */
+}
+
 
 .hero-search-button {
   background: var(--gradient-2);

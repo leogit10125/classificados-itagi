@@ -43,24 +43,24 @@ function Home() {
   // Pegar apenas os 6 primeiros para o carrossel
   const anunciosDestaque = anuncios.slice(0, 6);
 
-  // 👇 LOG CORRETO (fora do JSX)
-  console.log('🖥️ Renderizando Home - Categories será renderizado');
+  console.log('🖥️ Renderizando Home');
 
   return (
-    <div className="home-container">
+    <div className="home-page">
       {/* HERO SECTION */}
       <Hero />
       
-      {/* CATEGORIAS - APENAS UMA VEZ! */}
+      {/* CATEGORIAS */}
       <Categories />
       
       {/* CARROSSEL DE ANÚNCIOS */}
-      <section className="featured-ads">
-        <div className="container">
-          <h2 className="section-title">📢 Anúncios Recentes</h2>
+      <section className="featured-ads-section">
+        <div className="featured-container">
+          <h2 className="featured-title">📢 Anúncios Recentes</h2>
           
           {loading && (
             <div className="loading-state">
+              <div className="spinner"></div>
               <p>Carregando anúncios...</p>
             </div>
           )}
@@ -79,12 +79,15 @@ function Home() {
             <>
               {anuncios.length === 0 ? (
                 <div className="empty-state">
-                  <p>Nenhum anúncio cadastrado ainda.</p>
+                  <p>📭 Nenhum anúncio cadastrado ainda.</p>
+                  <button className="create-ad-btn" onClick={() => window.location.href = '/anunciar'}>
+                    Seja o primeiro a anunciar!
+                  </button>
                 </div>
               ) : (
                 <>
                   <AdsCarousel ads={anunciosDestaque} />
-                  <p className="ads-count">{anuncios.length} anúncios encontrados</p>
+                  <p className="ads-count">📊 {anuncios.length} anúncios encontrados</p>
                 </>
               )}
             </>

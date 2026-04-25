@@ -62,7 +62,7 @@ function Hero() {
         <div className="hero-search">
           <input
             type="text"
-            placeholder="O que você está procurando?"
+            placeholder="Digite sua busca aqui"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={handleKeyPress}

@@ -1,48 +1,40 @@
 // backend/middleware/auth.js
+const jwt = require('jsonwebtoken');
 const db = require('../config/database-hostinger');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'seu-segredo-super-secreto-2024';
+
 module.exports = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  console.log('🔍 Auth - Header recebido:', authHeader ? 'Sim' : 'Não');
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('❌ Token não fornecido');
+    return res.status(401).json({ error: 'Token não fornecido' });
+  }
+  
+  const token = authHeader.split(' ')[1];
+  console.log('🔍 Token (primeiros 30 chars):', token.substring(0, 30) + '...');
+  
   try {
-    console.log('🔍 Auth middleware - Headers:', req.headers.authorization);
+    // Decodificar token JWT
+    const decoded = jwt.verify(token, JWT_SECRET);
+    console.log('✅ Token decodificado - ID:', decoded.id, 'Email:', decoded.email);
     
-    // Pegar token do header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
-    // Verificar se token existe
-    if (!token) {
-      console.log('❌ Token não fornecido');
-      return res.status(401).json({ error: 'Acesso negado. Token não fornecido.' });
-    }
-
-    console.log('🔍 Token recebido:', token.substring(0, 30) + '...');
-
-    // Decodificar token base64 (formato: email:timestamp)
-    const decoded = Buffer.from(token, 'base64').toString();
-    const email = decoded.split(':')[0];
-    
-    console.log('📧 Email decodificado:', email);
-
     // Buscar usuário no banco
-    const users = await db.query('SELECT id, nome, email FROM usuarios WHERE email = ?', [email]);
+    const users = await db.query('SELECT id, nome, email, telefone FROM usuarios WHERE id = ?', [decoded.id]);
     
     if (!users || users.length === 0) {
-      console.log('❌ Usuário não encontrado');
+      console.log('❌ Usuário não encontrado para ID:', decoded.id);
       return res.status(401).json({ error: 'Usuário não encontrado' });
     }
     
-    const user = users[0];
-    console.log('✅ Usuário autenticado:', user.nome);
-    
-    // Adicionar usuário à requisição
-    req.usuario = {
-      id: user.id,
-      email: user.email,
-      nome: user.nome
-    };
-    
+    req.usuario = users[0];
+    console.log('✅ Usuário autenticado:', req.usuario.nome);
     next();
+    
   } catch (error) {
-    console.error('❌ Erro na verificação do token:', error.message);
+    console.error('❌ Erro no auth:', error.message);
     res.status(401).json({ error: 'Token inválido: ' + error.message });
   }
 };
