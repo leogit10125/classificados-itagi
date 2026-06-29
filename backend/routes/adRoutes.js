@@ -1,6 +1,7 @@
+// backend/routes/adRoutes.js
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database-hostinger');
+const db = require('../config/db');
 const upload = require('../middleware/upload');
 const authMiddleware = require('../middleware/auth');
 const checkAdLimit = require('../middleware/checkAdLimit');
@@ -34,10 +35,12 @@ const processarImagens = (imagensRaw) => {
 
 // Função auxiliar para pegar anúncios gratuitos restantes
 async function getGratuitosRestantes(usuarioId) {
-  const [result] = await db.query(
+  // 💡 Regra 2: Espera apenas um registro (Rows desestruturado e pego pelo índice [0])
+  const [rows] = await db.query(
     'SELECT anuncios_gratuitos_restantes FROM usuarios WHERE id = ?',
     [usuarioId]
   );
+  const result = rows[0];
   return result?.anuncios_gratuitos_restantes || 0;
 }
 
@@ -48,13 +51,15 @@ async function getGratuitosRestantes(usuarioId) {
 // LISTAR TODOS OS ANÚNCIOS (Usado na Home)
 router.get('/', async (req, res) => {
   try {
+    // 💡 Regra 5: Ajustado para usar criado_em
     const query = `
       SELECT a.*, u.nome as usuario_nome, u.telefone
       FROM anuncios a
       LEFT JOIN usuarios u ON a.usuario_id = u.id
-      ORDER BY a.created_at DESC
+      ORDER BY a.criado_em DESC
     `;
-    const anuncios = await db.query(query);
+    // 💡 Regra 1: Desestruturando o SELECT de todos os anúncios
+    const [anuncios] = await db.query(query);
     
     const anunciosProcessados = anuncios.map(ad => ({
       ...ad,
@@ -84,15 +89,17 @@ router.get('/meus-anuncios', authMiddleware, async (req, res) => {
       });
     }
 
+    // 💡 Regra 5: Substituído created_at por criado_em
     const query = `
       SELECT a.*, u.nome as usuario_nome, u.telefone, u.email
       FROM anuncios a
       LEFT JOIN usuarios u ON a.usuario_id = u.id
       WHERE a.usuario_id = ?
-      ORDER BY a.created_at DESC
+      ORDER BY a.criado_em DESC
     `;
     
-    const anuncios = await db.query(query, [usuarioId]);
+    // 💡 Regra 1: Desestruturando as linhas retornadas
+    const [anuncios] = await db.query(query, [usuarioId]);
     
     console.log(`✅ Encontrados ${anuncios.length} anúncios`);
     
@@ -122,9 +129,11 @@ router.get('/meus-anuncios', authMiddleware, async (req, res) => {
 router.get('/usuario/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const query = `SELECT * FROM anuncios WHERE usuario_id = ? ORDER BY created_at DESC`;
+    // 💡 Regra 5: Substituído created_at por criado_em
+    const query = `SELECT * FROM anuncios WHERE usuario_id = ? ORDER BY criado_em DESC`;
     
-    const anuncios = await db.query(query, [userId]);
+    // 💡 Regra 1: Desestruturando o array de resultados
+    const [anuncios] = await db.query(query, [userId]);
     
     const anunciosProcessados = anuncios.map(ad => ({
       ...ad,
@@ -149,10 +158,11 @@ router.get('/:id', async (req, res) => {
       LEFT JOIN usuarios u ON a.usuario_id = u.id
       WHERE a.id = ?
     `;
-    const resultados = await db.query(query, [id]);
-    if (resultados.length === 0) return res.status(404).json({ error: 'Não encontrado' });
+    // 💡 Regra 2: Esperando um único registro com rows[0] de forma segura
+    const [rows] = await db.query(query, [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Não encontrado' });
     
-    const ad = resultados[0];
+    const ad = rows[0];
     res.json({
       ...ad,
       preco: parseFloat(ad.preco) || 0,
@@ -181,16 +191,17 @@ router.post('/', authMiddleware, checkAdLimit, upload.array('imagens', 5), async
       imagensArray = req.files.map(file => file.filename);
     }
 
-    // Inserir anúncio
-    const result = await db.query(
+    // 💡 Regra 3 & 5: Adicionado [result] para desestruturar o INSERT e alterado para criado_em
+    const [result] = await db.query(
       `INSERT INTO anuncios 
-       (titulo, descricao, preco, categoria, localizacao, imagens, usuario_id, created_at) 
+       (titulo, descricao, preco, categoria, localizacao, imagens, usuario_id, criado_em) 
        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
       [titulo, descricao, parseFloat(preco), categoria, localizacao, JSON.stringify(imagensArray), usuarioId]
     );
 
     // Atualizar contadores do usuário
     if (adType === 'gratuito') {
+      // 💡 Regra 4: Desestruturando o UPDATE
       await db.query(
         'UPDATE usuarios SET anuncios_gratuitos_restantes = anuncios_gratuitos_restantes - 1 WHERE id = ?',
         [usuarioId]
@@ -207,17 +218,21 @@ router.post('/', authMiddleware, checkAdLimit, upload.array('imagens', 5), async
       
     } else {
       // Anúncio pago - decrementar do pacote ou anuncios_pagos
-      const [usuario] = await db.query(
+      // 💡 Regra 2: Mudado para rows[0] para ler os campos do usuário com segurança
+      const [rows] = await db.query(
         'SELECT pacote_anuncios, anuncios_pagos FROM usuarios WHERE id = ?',
         [usuarioId]
       );
+      const usuario = rows[0];
       
-      if (usuario.pacote_anuncios > 0) {
+      if (usuario?.pacote_anuncios > 0) {
+        // 💡 Regra 4: Desestruturado UPDATE do pacote
         await db.query(
           'UPDATE usuarios SET pacote_anuncios = pacote_anuncios - 1 WHERE id = ?',
           [usuarioId]
         );
-      } else if (usuario.anuncios_pagos > 0) {
+      } else if (usuario?.anuncios_pagos > 0) {
+        // 💡 Regra 4: Desestruturado UPDATE dos pagos normais
         await db.query(
           'UPDATE usuarios SET anuncios_pagos = anuncios_pagos - 1 WHERE id = ?',
           [usuarioId]
@@ -250,7 +265,8 @@ router.put('/:id', authMiddleware, upload.array('imagens', 5), async (req, res) 
     console.log(`✏️ Editando anúncio ${id} do usuário ${usuarioId}`);
     
     // Buscar anúncio existente
-    const anuncios = await db.query('SELECT * FROM anuncios WHERE id = ?', [id]);
+    // 💡 Regra 1: Desestruturando o array de retorno do SELECT
+    const [anuncios] = await db.query('SELECT * FROM anuncios WHERE id = ?', [id]);
     
     if (anuncios.length === 0) {
       return res.status(404).json({ error: 'Anúncio não encontrado' });
@@ -293,6 +309,7 @@ router.put('/:id', authMiddleware, upload.array('imagens', 5), async (req, res) 
     }
     
     // Atualizar banco de dados
+    // 💡 Regra 4: Adicionada desestruturação do UPDATE
     await db.query(
       `UPDATE anuncios 
        SET titulo = ?, descricao = ?, preco = ?, categoria = ?, localizacao = ?, imagens = ?
@@ -304,7 +321,7 @@ router.put('/:id', authMiddleware, upload.array('imagens', 5), async (req, res) 
     
     res.json({ 
       success: true, 
-      message: 'Anúncio atualizado com sucesso!',
+      message: 'Anúncio updated com sucesso!',
       imagens: imagensAtuais
     });
     
@@ -320,7 +337,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const usuarioId = req.usuario?.id;
 
-    const anuncios = await db.query('SELECT * FROM anuncios WHERE id = ?', [id]);
+    // 💡 Regra 1: Desestruturação do SELECT na verificação
+    const [anuncios] = await db.query('SELECT * FROM anuncios WHERE id = ?', [id]);
     if (anuncios.length === 0) return res.status(404).json({ error: 'Anúncio não encontrado' });
 
     const ad = anuncios[0];
@@ -341,6 +359,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       }
     });
 
+    // 💡 Regra 4: Desestruturação adicionada para o comando DELETE
     await db.query('DELETE FROM anuncios WHERE id = ?', [id]);
     res.json({ success: true, message: 'Anúncio e arquivos removidos com sucesso' });
 

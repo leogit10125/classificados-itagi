@@ -1,5 +1,5 @@
 // backend/controllers/anuncios-controller.js
-const pool = require('../config/database-hostinger');
+const pool = require('../config/db');
 
 // Listar todos os anúncios
 async function listarAnuncios(req, res) {

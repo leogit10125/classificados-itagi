@@ -10,6 +10,8 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      # 🔥 ADICIONE ESTA LINHA ABAIXO:
+      - ./database:/docker-entrypoint-initdb.d
 
   backend:
     build: ./backend
@@ -19,7 +21,7 @@ services:
       - "3000:3000"
     volumes:
       - ./backend/uploads:/app/uploads
-      - ./backend:/app  # 👈 ADICIONAR ESTA LINHA - Mapeia todo o backend
+      - ./backend:/app
     environment:
       - PORT=3000
       - DB_HOST=mysql
@@ -38,8 +40,8 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend:/app  # 👈 ADICIONAR ESTA LINHA - Mapeia todo o frontend
-      - /app/node_modules  # 👈 Mantém node_modules dentro do container
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
 

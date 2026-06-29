@@ -1,5 +1,5 @@
 // Importa a conexão do banco (AJUSTE O CAMINHO!)
-const db = require('../config/database-hostinger'); // 👈 MUDA SE PRECISAR!
+const db = require('../config/db'); // 👈 MUDA SE PRECISAR!
 
 async function popularBanco() {
   try {

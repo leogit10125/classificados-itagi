@@ -5,8 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const bcrypt = require('bcryptjs'); // 💡 Unificado para bcryptjs para evitar quebras em ambientes Docker/Alpine
 
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'seu-segredo-super-secreto-2024';
@@ -27,9 +26,9 @@ console.log(`   DB_NAME: ${process.env.DB_NAME}`);
 const app = express();
 
 // =====================================
-// CONEXÃO COM BANCO
+// CONEXÃO COM BANCO (ATUALIZADO PARA O NOVO POOL DO DOCKER)
 // =====================================
-const db = require('./config/database-hostinger');
+const db = require('./config/db');
 
 // =====================================
 // IMPORTS DAS ROTAS
@@ -65,62 +64,55 @@ app.use((req, res, next) => {
 // ROTAS DA API
 // =====================================
 
-// Rota de categorias
 if (categoriaRoutes && typeof categoriaRoutes === 'function') {
     app.use('/api/categorias', categoriaRoutes);
     console.log('✅ Rota /api/categorias carregada');
 }
 
-// Rotas de autenticação
 if (authRoutes && typeof authRoutes === 'function') {
     app.use('/api/auth', authRoutes);
     console.log('✅ Rota /api/auth carregada');
 }
 
-// Rotas de anúncios (INCLUI /meus-anuncios)
 if (adRoutes && typeof adRoutes === 'function') {
     app.use('/api/ads', adRoutes);
     console.log('✅ Rota /api/ads carregada');
 }
 
-// Rotas de estatísticas
 if (statsRoutes && typeof statsRoutes === 'function') {
     app.use('/api', statsRoutes);
     console.log('✅ Rota /api/stats carregada');
 }
 
-// ROTA DE PACOTES
 if (pacotesRoutes && typeof pacotesRoutes === 'function') {
     app.use('/api/pacotes', pacotesRoutes);
     console.log('✅ Rota /api/pacotes carregada');
 }
 
-// ROTA DE RECUPERAÇÃO DE SENHA
 if (passwordRoutes && typeof passwordRoutes === 'function') {
     app.use('/api/password', passwordRoutes);
     console.log('✅ Rota /api/password carregada');
 }
 
 // =====================================
-// ROTA DE REGISTRO (COM BCRYPT)
+// ROTA DE REGISTRO (AJUSTADA PARA MYSQL2/PROMISE)
 // =====================================
 app.post('/api/registro', async (req, res) => {
   const { nome, email, senha, telefone } = req.body;
   console.log('📝 Tentativa de registro:', email);
   
   try {
-    // Verificar se usuário já existe
-    const existingUser = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
+    // [existingUser] desestrutura o retorno pegando apenas as linhas (rows)
+    const [existingUser] = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
     
     if (existingUser.length > 0) {
       return res.status(400).json({ error: 'Email já cadastrado' });
     }
     
-    // Hash da senha
-    const hashedPassword = await bcrypt.hash(senha, saltRounds);
+    const hashedPassword = await bcrypt.hash(senha, 10);
     
-    // Inserir usuário com senha hash
-    const result = await db.query(
+    // 💡 Regra 3: Desestruturação utilizada no retorno do INSERT
+    const [result] = await db.query(
       'INSERT INTO usuarios (nome, email, senha, telefone, anuncios_gratuitos_restantes) VALUES (?, ?, ?, ?, 2)',
       [nome, email, hashedPassword, telefone || '']
     );
@@ -138,30 +130,27 @@ app.post('/api/registro', async (req, res) => {
 });
 
 // =====================================
-// ROTA DE LOGIN (COM BCRYPT E JWT)
+// ROTA DE LOGIN (AJUSTADA PARA MYSQL2/PROMISE)
 // =====================================
 app.post('/api/login', async (req, res) => {
   const { email, senha } = req.body;
   console.log('📝 Tentativa de login:', email);
   
   try {
-    // Buscar usuário pelo email (incluindo senha)
-    const users = await db.query('SELECT id, nome, email, telefone, senha FROM usuarios WHERE email = ?', [email]);
+    const [users] = await db.query('SELECT id, nome, email, telefone, senha FROM usuarios WHERE email = ?', [email]);
     
     if (users.length === 0) {
       console.log('❌ Usuário não encontrado:', email);
       return res.status(401).json({ error: 'Email ou senha inválidos' });
     }
     
+    // 💡 Regra 2: Busca por apenas um registro utilizando índice [0] de forma segura
     const user = users[0];
-    
-    // Comparar a senha fornecida com o hash do banco
     const senhaValida = await bcrypt.compare(senha, user.senha);
     
     if (senhaValida) {
       console.log('✅ Login bem sucedido:', email);
       
-      // Gerar token JWT
       const token = jwt.sign(
         { id: user.id, email: user.email, nome: user.nome },
         JWT_SECRET,
@@ -190,7 +179,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // =====================================
-// ROTA ESPECÍFICA PARA MEUS ANÚNCIOS (COM JWT)
+// ROTA ESPECÍFICA PARA MEUS ANÚNCIOS (AJUSTADA PARA MYSQL2/PROMISE)
 // =====================================
 app.get('/api/meus-anuncios', async (req, res) => {
   console.log('🔍 Buscando meus anúncios...');
@@ -207,21 +196,20 @@ app.get('/api/meus-anuncios', async (req, res) => {
   }
   
   try {
-    // DECODIFICAR TOKEN JWT
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.id;
     
     console.log(`👤 Buscando anúncios do usuário ID: ${userId}`);
     
+    // 💡 Regra 5: Corrigido created_at para criado_em e removido JOIN de categoria_id que causava conflito
     const anunciosQuery = `
-      SELECT a.*, c.nome as categoria_nome 
+      SELECT a.*, a.categoria as categoria_nome 
       FROM anuncios a
-      LEFT JOIN categorias c ON a.categoria_id = c.id
       WHERE a.usuario_id = ?
-      ORDER BY a.created_at DESC
+      ORDER BY a.criado_em DESC
     `;
     
-    const anuncios = await db.query(anunciosQuery, [userId]);
+    const [anuncios] = await db.query(anunciosQuery, [userId]);
     
     console.log(`✅ Encontrados ${anuncios.length} anúncios`);
     
@@ -254,8 +242,10 @@ app.get('/api/status', (req, res) => {
 
 app.get('/api/test', async (req, res) => {
   try {
-    const usuarios = await db.query('SELECT COUNT(*) as total FROM usuarios');
-    res.json({ status: '✅ Conexão OK', total_usuarios: usuarios[0].total });
+    // 💡 Regra 2: Capturando a contagem em formato de registro único de agregação
+    const [rows] = await db.query('SELECT COUNT(*) as total FROM usuarios');
+    const usuarios = rows[0];
+    res.json({ status: '✅ Conexão OK', total_usuarios: usuarios?.total || 0 });
   } catch (error) {
     res.status(500).json({ error: 'Erro no banco', detalhes: error.message });
   }
@@ -278,15 +268,4 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Backend rodando em: http://localhost:${PORT}`);
-  console.log(`📋 Rotas disponíveis:`);
-  console.log(`   POST /api/registro`);
-  console.log(`   POST /api/login`);
-  console.log(`   GET  /api/meus-anuncios`);
-  console.log(`   GET  /api/status`);
-  console.log(`   GET  /api/test`);
-  console.log(`   POST /api/password/recuperar`);
-  console.log(`   POST /api/password/redefinir`);
-  console.log(`   /api/ads/*`);
-  console.log(`   /api/auth/*`);
-  console.log(`   /api/pacotes/*`);
 });

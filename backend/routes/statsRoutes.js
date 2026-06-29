@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database-hostinger');
+const db = require('../config/db');
 
 router.get('/stats', async (req, res) => {
   try {

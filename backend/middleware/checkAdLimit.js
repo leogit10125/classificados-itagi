@@ -1,5 +1,5 @@
 // backend/middleware/checkAdLimit.js
-const db = require('../config/database-hostinger');
+const db = require('../config/db');
 
 async function checkAdLimit(req, res, next) {
   try {
@@ -9,29 +9,36 @@ async function checkAdLimit(req, res, next) {
       return res.status(401).json({ error: 'Usuário não autenticado' });
     }
 
-    // Buscar usuário e seus anúncios
-    const [usuario] = await db.query(
-      'SELECT anuncios_gratuitos_restantes, anuncios_pagos, pacote_anuncios, pacote_valido_ate FROM usuarios WHERE id = ?',
+    // 💡 Regra 2: Espera apenas um registro (Desestruturando rows e pegando o índice [0])
+    const [userRows] = await db.query(
+      `SELECT
+          anuncios_gratuitos_restantes,
+          anuncios_pagos,
+          pacote_anuncios
+       FROM usuarios
+       WHERE id = ?`,
       [usuarioId]
     );
+    const usuario = userRows[0];
 
     if (!usuario) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
 
-    // Contar anúncios do usuário
-    const [anunciosCount] = await db.query(
+    // 💡 Regra 2: Desestruturando agregação COUNT(*) do banco de dados
+    const [adRows] = await db.query(
       'SELECT COUNT(*) as total FROM anuncios WHERE usuario_id = ?',
       [usuarioId]
     );
+    const anunciosCount = adRows[0];
 
-    const totalAnuncios = anunciosCount.total;
-    const gratuitosUsados = 2 - (usuario.anuncios_gratuitos_restantes || 0);
-    const pagosDisponiveis = (usuario.pacote_anuncios || 0) + (usuario.anuncios_pagos || 0);
+    const totalAnuncios = anunciosCount?.total || 0;
+    const gratuitosRestantes = usuario?.anuncios_gratuitos_restantes || 0;
+    const pagosDisponiveis = (usuario?.pacote_anuncios || 0) + (usuario?.anuncios_pagos || 0);
     
-    // Verificar se pode criar anúncio
-    if (totalAnuncios < 2) {
-      // Ainda tem anúncio grátis
+    // Verificar se pode criar anúncio baseado no saldo de anúncios gratuitos restantes
+    if (gratuitosRestantes > 0) {
+      // Ainda tem anúncio grátis disponível no saldo do usuário
       req.adType = 'gratuito';
       return next();
     } else if (pagosDisponiveis > 0) {
@@ -39,11 +46,11 @@ async function checkAdLimit(req, res, next) {
       req.adType = 'pago';
       return next();
     } else {
-      // Sem créditos, precisa pagar
+      // Sem créditos gratuitos ou pagos, barra a requisição retornando HTTP 402
       return res.status(402).json({ 
         error: 'Limite de anúncios gratuitos atingido',
         precisaPagar: true,
-        mensagem: 'Você já usou seus 2 anúncios gratuitos. Adquira um pacote para continuar anunciando.',
+        mensagem: 'Você já usou seus anúncios gratuitos. Adquira um pacote para continuar anunciando.',
         pacotes: [
           { id: 1, nome: 'Pacote Básico', quantidade: 5, preco: 10.00 },
           { id: 2, nome: 'Pacote Popular', quantidade: 12, preco: 20.00 },
@@ -54,7 +61,7 @@ async function checkAdLimit(req, res, next) {
 
   } catch (error) {
     console.error('❌ Erro ao verificar limite:', error);
-    res.status(500).json({ error: 'Erro interno' });
+    res.status(500).json({ error: 'Erro interno ao validar limite de anúncios', details: error.message });
   }
 }
 

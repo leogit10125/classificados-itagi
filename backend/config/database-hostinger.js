@@ -1,4 +1,4 @@
-// backend/config/database-hostinger.js
+// backend/config/db.js
 const mariadb = require('mariadb');
 
 // Pool de conexões - VERSÃO CORRIGIDA

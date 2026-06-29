@@ -24,7 +24,7 @@ const app = express();  // ✅ APP CRIADO AQUI
 // =====================================
 // CONEXÃO COM BANCO
 // =====================================
-const db = require('./config/database-hostinger');
+const db = require('./config/db');
 
 // =====================================
 // IMPORTS DAS ROTAS (depois do app, mas antes de usar)

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database-hostinger');
+const db = require('../config/db');
 
 // Listar categorias com contagem de anúncios
 router.get('/', async (req, res) => {

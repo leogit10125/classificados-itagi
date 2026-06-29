@@ -1,0 +1,17 @@
+# Dependências
+node_modules/
+
+# Variáveis de ambiente
+.env
+backend/.env
+frontend/.env
+
+# Uploads
+backend/uploads/
+
+# Backups
+backup.sql
+backup-*/
+
+# Arquivos temporários
+*.bak

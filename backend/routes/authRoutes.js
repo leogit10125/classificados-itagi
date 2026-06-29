@@ -1,3 +1,4 @@
+// backend/routes/authRoutes.js
 // Importa dependências necessárias
 const express = require('express');          // Framework para criar rotas e servidor
 const router = express.Router();             // Cria um roteador específico para autenticação
@@ -7,7 +8,7 @@ const crypto = require('crypto');             // Para gerar tokens aleatórios
 const nodemailer = require('nodemailer');     // Para enviar emails
 
 // Conexão com o banco de dados (MariaDB configurado na Hostinger)
-const db = require('../config/database-hostinger');
+const db = require('../config/db');
 
 // ---------------- CONFIGURAÇÃO DE EMAIL ----------------
 // Configurar transporte de email (use variáveis de ambiente)
@@ -36,7 +37,8 @@ router.post('/register', async (req, res) => {
     }
 
     // 2. Verifica se já existe usuário com esse email
-    const existing = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
+    // 💡 Regra 1: Desestruturando o array de retorno do SELECT
+    const [existing] = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
     if (existing && existing.length > 0) {
       return res.status(400).json({ error: 'Email já cadastrado' });
     }
@@ -46,7 +48,8 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // 4. Insere usuário no banco
-    const result = await db.execute(
+    // 💡 Regra 3: Mudado para db.query com desestruturação [result] para pegar o insertId de forma limpa
+    const [result] = await db.query(
       'INSERT INTO usuarios (nome, email, senha, telefone) VALUES (?, ?, ?, ?)',
       [name, email, hashedPassword, phone || null]
     );
@@ -86,12 +89,13 @@ router.post('/login', async (req, res) => {
     }
 
     // 2. Busca usuário no banco
-    const users = await db.query('SELECT * FROM usuarios WHERE email = ?', [email]);
-    if (!users || users.length === 0) {
+    // 💡 Regra 2: Espera um único registro de usuário (Rows desestruturado e isolado com .length)
+    const [userRows] = await db.query('SELECT * FROM usuarios WHERE email = ?', [email]);
+    if (!userRows || userRows.length === 0) {
       return res.status(401).json({ error: 'Email ou senha inválidos' });
     }
 
-    const user = users[0];
+    const user = userRows[0];
 
     // 3. Compara senha digitada com a senha criptografada
     const isMatch = await bcrypt.compare(password, user.senha);
@@ -139,16 +143,17 @@ router.get('/verify', async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'segredo_temporario_123');
 
     // Busca dados atualizados do usuário
-    const users = await db.query(
+    // 💡 Regra 2: Desestruturando rows para pegar um usuário específico
+    const [userRows] = await db.query(
       'SELECT id, nome, email, telefone, role FROM usuarios WHERE id = ?', 
       [decoded.id]
     );
 
-    if (!users || users.length === 0) {
+    if (!userRows || userRows.length === 0) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
 
-    res.json({ user: users[0] });
+    res.json({ user: userRows[0] });
 
   } catch (error) {
     console.error('❌ Erro na verificação do token:', error);
@@ -172,20 +177,22 @@ router.post('/esqueci-senha', async (req, res) => {
     console.log('🔑 Solicitação de redefinição para:', email);
 
     // Verificar se email existe
-    const users = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
-    if (!users || users.length === 0) {
+    // 💡 Regra 2: Desestruturando rows e checando o índice [0] de forma direta
+    const [userRows] = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
+    if (!userRows || userRows.length === 0) {
       // Por segurança, não informamos que o email não existe
       return res.json({ message: 'Se o email existir, você receberá um link de redefinição' });
     }
 
-    const usuarioId = users[0].id;
+    const usuarioId = userRows[0].id;
 
     // Gerar token único (32 bytes hex)
     const token = crypto.randomBytes(32).toString('hex');
     const expiraEm = new Date(Date.now() + 3600000); // +1 hora
 
-    // Salvar token no banco (criar tabela se não existir)
-    await db.execute(
+    // Salvar token no banco
+    // 💡 Regra 3: Ajustado para db.query e adicionado desestruturação [result] no INSERT/UPDATE
+    await db.query(
       `INSERT INTO password_resets (usuario_id, token, expira_em) 
        VALUES (?, ?, ?)
        ON DUPLICATE KEY UPDATE token = VALUES(token), expira_em = VALUES(expira_em)`,
@@ -227,7 +234,8 @@ router.get('/resetar-senha/:token', async (req, res) => {
   try {
     const { token } = req.params;
 
-    const resets = await db.query(
+    // 💡 Regra 1: Desestruturando o SELECT na validação de array
+    const [resets] = await db.query(
       'SELECT * FROM password_resets WHERE token = ? AND expira_em > NOW()',
       [token]
     );
@@ -255,29 +263,32 @@ router.post('/resetar-senha/:token', async (req, res) => {
     }
 
     // Buscar token válido
-    const resets = await db.query(
+    // 💡 Regra 2: Espera apenas um registro (Rows desestruturado e pego por índice)
+    const [resetRows] = await db.query(
       'SELECT * FROM password_resets WHERE token = ? AND expira_em > NOW()',
       [token]
     );
 
-    if (!resets || resets.length === 0) {
+    if (!resetRows || resetRows.length === 0) {
       return res.status(400).json({ error: 'Link inválido ou expirado' });
     }
 
-    const reset = resets[0];
+    const reset = resetRows[0];
 
     // Criptografar nova senha
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(senha, salt);
 
     // Atualizar senha do usuário
-    await db.execute(
+    // 💡 Regra 4: Alterado para db.query com desestruturação de [result] para o UPDATE
+    await db.query(
       'UPDATE usuarios SET senha = ? WHERE id = ?',
       [hashedPassword, reset.usuario_id]
     );
 
     // Remover token usado
-    await db.execute('DELETE FROM password_resets WHERE token = ?', [token]);
+    // 💡 Regra 4: Alterado para db.query com desestruturação de [result] para o DELETE
+    await db.query('DELETE FROM password_resets WHERE token = ?', [token]);
 
     console.log('✅ Senha redefinida para usuário ID:', reset.usuario_id);
     res.json({ message: 'Senha alterada com sucesso' });
@@ -291,7 +302,8 @@ router.post('/resetar-senha/:token', async (req, res) => {
 // 📌 Rota para listar usuários (apenas para teste, não usar em produção)
 router.get('/users', async (req, res) => {
   try {
-    const users = await db.query('SELECT id, nome, email, telefone, role FROM usuarios LIMIT 10');
+    // 💡 Regra 1: Desestruturando o array retornado no SELECT geral
+    const [users] = await db.query('SELECT id, nome, email, telefone, role FROM usuarios LIMIT 10');
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });

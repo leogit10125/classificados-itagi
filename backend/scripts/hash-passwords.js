@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const db = require('../config/database-hostinger');
+const db = require('../config/db');
 
 async function hashExistingPasswords() {
   try {

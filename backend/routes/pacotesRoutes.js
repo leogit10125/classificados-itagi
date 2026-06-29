@@ -1,7 +1,7 @@
 // backend/routes/pacotesRoutes.js
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database-hostinger');
+const db = require('../config/db');
 const authMiddleware = require('../middleware/auth');
 
 // Listar pacotes disponíveis
@@ -20,17 +20,18 @@ router.post('/comprar', authMiddleware, async (req, res) => {
     const usuarioId = req.usuario?.id;
     const { pacoteId, quantidade, valor } = req.body;
 
-    // Registrar transação
-    const result = await db.query(
-      `INSERT INTO transacoes (usuario_id, tipo, quantidade, valor, status) 
-       VALUES (?, 'pacote', ?, ?, 'pendente')`,
-      [usuarioId, quantidade, valor]
+    if (!usuarioId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    // 💡 Regra 3: Desestruturando o INSERT da transação (Mantenha a tabela se ela existir, ou adapte para 'pagamentos')
+    const [result] = await db.query(
+      `INSERT INTO pagamentos (usuario_id, plano, valor, status, metodo) 
+       VALUES (?, 'pacote', ?, 'pago', 'simulacao')`,
+      [usuarioId, valor]
     );
 
-    // SIMULAÇÃO DE PAGAMENTO APROVADO
-    // Em produção, aqui você esperaria o webhook do pagamento
-    
-    // Atualizar créditos do usuário
+    // 💡 Regra 4: Desestruturando o UPDATE de créditos do usuário
     await db.query(
       `UPDATE usuarios 
        SET pacote_anuncios = pacote_anuncios + ? 
@@ -38,30 +39,25 @@ router.post('/comprar', authMiddleware, async (req, res) => {
       [quantidade, usuarioId]
     );
 
-    // Atualizar status da transação
-    await db.query(
-      'UPDATE transacoes SET status = "pago" WHERE id = ?',
-      [result.insertId]
-    );
-
-    // Buscar dados atualizados
-    const [usuario] = await db.query(
+    // 💡 Regra 2: Espera apenas um registro (Rows desestruturado e capturado de forma segura via índice [0])
+    const [rows] = await db.query(
       'SELECT anuncios_gratuitos_restantes, pacote_anuncios, anuncios_pagos FROM usuarios WHERE id = ?',
       [usuarioId]
     );
+    const usuario = rows[0];
 
     res.json({
       success: true,
-      message: `Compra realizada! Você agora tem ${usuario.pacote_anuncios} anúncios pagos disponíveis.`,
+      message: `Compra realizada! Você agora tem ${usuario?.pacote_anuncios || 0} anúncios pagos disponíveis.`,
       creditos: {
-        gratuitos: usuario.anuncios_gratuitos_restantes,
-        pagos: usuario.pacote_anuncios
+        gratuitos: usuario?.anuncios_gratuitos_restantes || 0,
+        pagos: usuario?.pacote_anuncios || 0
       }
     });
 
   } catch (error) {
     console.error('❌ Erro na compra:', error);
-    res.status(500).json({ error: 'Erro ao processar compra' });
+    res.status(500).json({ error: 'Erro ao processar compra', details: error.message });
   }
 });
 
@@ -69,31 +65,39 @@ router.post('/comprar', authMiddleware, async (req, res) => {
 router.get('/creditos', authMiddleware, async (req, res) => {
   try {
     const usuarioId = req.usuario?.id;
+
+    if (!usuarioId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
     
-    const [usuario] = await db.query(
+    // 💡 Regra 2: Desestruturando dados de um único usuário
+    const [userRows] = await db.query(
       'SELECT anuncios_gratuitos_restantes, pacote_anuncios, anuncios_pagos FROM usuarios WHERE id = ?',
       [usuarioId]
     );
+    const usuario = userRows[0];
 
-    const [anunciosCount] = await db.query(
+    // 💡 Regra 2: Desestruturando retorno de agregação COUNT(*)
+    const [adRows] = await db.query(
       'SELECT COUNT(*) as total FROM anuncios WHERE usuario_id = ?',
       [usuarioId]
     );
+    const anunciosCount = adRows[0];
 
-    const gratuitosUsados = 2 - (usuario.anuncios_gratuitos_restantes || 0);
-    const creditosPagos = (usuario.pacote_anuncios || 0) + (usuario.anuncios_pagos || 0);
+    const gratuitosUsados = 2 - (usuario?.anuncios_gratuitos_restantes || 0);
+    const creditosPagos = (usuario?.pacote_anuncios || 0) + (usuario?.anuncios_pagos || 0);
 
     res.json({
       limiteGratuito: 2,
-      anunciosGratuitosUsados: gratuitosUsados,
-      anunciosGratuitosRestantes: usuario.anuncios_gratuitos_restantes || 0,
+      anunciosGratuitosUsados: gratuitosUsados < 0 ? 0 : gratuitosUsados,
+      anunciosGratuitosRestantes: usuario?.anuncios_gratuitos_restantes || 0,
       creditosPagosDisponiveis: creditosPagos,
-      totalAnuncios: anunciosCount.total
+      totalAnuncios: anunciosCount?.total || 0
     });
 
   } catch (error) {
-    console.error('❌ Erro:', error);
-    res.status(500).json({ error: 'Erro ao verificar créditos' });
+    console.error('❌ Erro ao buscar créditos:', error);
+    res.status(500).json({ error: 'Erro ao verificar créditos', details: error.message });
   }
 });
 

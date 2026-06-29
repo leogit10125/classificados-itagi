@@ -9,10 +9,10 @@ async function setupBanco() {
     
    // Linha 11 do seu arquivo - Substitua por esta:
    connection = await mysql.createConnection({
-     host: 'localhost',
-     user: 'root',
-     password: '', // Senha vazia (padrão do XAMPP/MariaDB)
-     port: 3306
+    host: '127.0.0.1',
+    user: 'root',
+    password: 'root',
+    port: 3306
    });
     
     console.log('✅ Conectado ao MySQL');

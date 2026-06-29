@@ -1,6 +1,6 @@
 // backend/middleware/auth.js
 const jwt = require('jsonwebtoken');
-const db = require('../config/database-hostinger');
+const db = require('../config/db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'seu-segredo-super-secreto-2024';
 
@@ -21,8 +21,8 @@ module.exports = async (req, res, next) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     console.log('✅ Token decodificado - ID:', decoded.id, 'Email:', decoded.email);
     
-    // Buscar usuário no banco
-    const users = await db.query('SELECT id, nome, email, telefone FROM usuarios WHERE id = ?', [decoded.id]);
+    // 💡 CORREÇÃO: Adicionado colchetes [users] para desestruturar as linhas no mysql2/promise
+    const [users] = await db.query('SELECT id, nome, email, telefone FROM usuarios WHERE id = ?', [decoded.id]);
     
     if (!users || users.length === 0) {
       console.log('❌ Usuário não encontrado para ID:', decoded.id);
@@ -30,7 +30,7 @@ module.exports = async (req, res, next) => {
     }
     
     req.usuario = users[0];
-    console.log('✅ Usuário autenticado:', req.usuario.nome);
+    console.log('✅ Usuário autenticado:', req.usuario?.nome || 'Nome não encontrado');
     next();
     
   } catch (error) {
