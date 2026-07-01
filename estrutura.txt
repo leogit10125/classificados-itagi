@@ -1,0 +1,52 @@
+.
+├── backend
+│   ├── config
+│   ├── controllers
+│   ├── Dockerfile
+│   ├── hash-passwords.js
+│   ├── middleware
+│   ├── models
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── routes
+│   ├── scripts
+│   ├── server.js
+│   ├── server.js.bak
+│   ├── services
+│   ├── testar-banco.js
+│   ├── testar-conexao-detailed.js
+│   ├── teste.json
+│   └── uploads
+├── backup-1771537452008
+│   ├── App.css
+│   ├── App.jsx
+│   ├── assets
+│   ├── components
+│   ├── contexts
+│   ├── data
+│   ├── index.css
+│   ├── main.jsx
+│   ├── pages
+│   └── services
+├── backup.sql
+├── database
+│   ├── schema.sql
+│   └── seeds.sql
+├── docker-compose.yml
+├── estrutura.txt
+├── frontend
+│   ├── Dockerfile
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   ├── src
+│   ├── tailwind.config.js
+│   └── vite.config.js
+├── package.json
+├── package-lock.json
+├── README.md
+└── reorganizar-projeto.cjs
+
+21 directories, 29 files

@@ -51,116 +51,142 @@ function Menu() {
   }
 
   return (
-    <nav className="menu">
-      <div className="menu-container">
-        {/* Logo */}
-        <div className="menu-logo">
-          <Link to="/" onClick={closeMenu}>
-            <h1>Itagiclassificados.com</h1>
-            
-          </Link>
-        </div>
+<nav className="navbar">
 
-        {/* Barra de busca (Desktop) */}
-        {!isMobile && (
-          <form onSubmit={handleSearch} className="menu-search">
-            <input
-              type="text"
-              placeholder="Buscar anúncios..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button type="submit">🔍</button>
-          </form>
-        )}
+  <div className="navbar-container">
 
-        {/* Hamburger Button (Mobile) */}
-        {isMobile && (
-          <button 
-            className={`hamburger ${isOpen ? 'active' : ''}`}
-            onClick={toggleMenu}
-            aria-label="Menu"
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        )}
+    {/* LOGO */}
+    <Link to="/" className="logo" onClick={closeMenu}>
+      <div className="logo-icon">📍</div>
 
-        {/* Menu Items */}
-        <ul className={`menu-items ${isMobile ? 'mobile' : ''} ${isOpen ? 'open' : ''}`}>
-          
-          {/* Busca mobile */}
-          {isMobile && (
-            <li className="mobile-search">
-              <form onSubmit={handleSearch}>
-                <input
-                  type="text"
-                  placeholder="Buscar anúncios..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button type="submit">🔍</button>
-              </form>
-            </li>
-          )}
+      <div className="logo-text">
+        <strong>ITAGI</strong>
+        <span>Classificados</span>
+      </div>
+    </Link>
 
-          <li><Link to="/" onClick={closeMenu}>Home</Link></li>
+    {/* BUSCA DESKTOP */}
+    {!isMobile && (
+      <form className="search-box" onSubmit={handleSearch}>
+        <input
+          type="text"
+          placeholder="O que você procura?"
+          value={searchTerm}
+          onChange={(e)=>setSearchTerm(e.target.value)}
+        />
+        <button>🔍</button>
+      </form>
+    )}
 
-          {/* Categorias */}
-          <li className={`dropdown ${activeDropdown === 1 ? 'active' : ''}`}>
-            <a href="#categorias" onClick={(e) => { e.preventDefault(); isMobile && toggleDropdown(1) }}>
-              Categorias <i>▼</i>
-            </a>
-            <ul className="dropdown-menu">
-              <li><Link to="/categoria/vendas" onClick={closeMenu}>🏷️ Vendas</Link></li>
-              <li><Link to="/categoria/servicos" onClick={closeMenu}>🔧 Serviços</Link></li>
-              <li><Link to="/categoria/imoveis" onClick={closeMenu}>🏠 Imóveis</Link></li>
-              <li><Link to="/categoria/veiculos" onClick={closeMenu}>🚗 Veículos</Link></li>
-            </ul>
-          </li>
+    {/* MENU */}
+    {!isMobile && (
 
-          {/* ÁREA DO USUÁRIO LOGADO ✅ */}
-          {isLoggedIn && (
-            <li>
-              <Link to="/meus-anuncios" onClick={closeMenu} style={{fontWeight: 'bold', color: '#4361ee'}}>
-                ✨ Meus Anúncios
-              </Link>
-            </li>
-          )}
+    <div className="desktop-menu">
 
-          {/* Institucional */}
-          <li className={`dropdown ${activeDropdown === 3 ? 'active' : ''}`}>
-            <a href="#institucional" onClick={(e) => { e.preventDefault(); isMobile && toggleDropdown(3) }}>
-              Sobre <i>▼</i>
-            </a>
-            <ul className="dropdown-menu">
-              <li><Link to="/sobre" onClick={closeMenu}>Quem Somos</Link></li>
-              <li><Link to="/contato" onClick={closeMenu}>Contato</Link></li>
-            </ul>
-          </li>
+      <Link to="/">Início</Link>
 
-          {/* Login/Logout */}
-          <li className="auth-item">
-            {isLoggedIn ? (
-              <button onClick={handleLogout} className="btn-logout">Sair</button>
-            ) : (
-              <Link to="/login" onClick={closeMenu}>Entrar</Link>
-            )}
-          </li>
+      <Link to="/categoria/vendas">Categorias</Link>
 
-          {/* Botão Anunciar */}
-          <li className="menu-button">
-            <Link to="/anunciar" className="btn-anunciar" onClick={closeMenu}>
-              Anunciar
-            </Link>
-          </li>
-        </ul>
+      {isLoggedIn && (
+        <Link to="/meus-anuncios">
+          Meus anúncios
+        </Link>
+      )}
+
+      {isLoggedIn ? (
+        <button
+        className="logout"
+        onClick={handleLogout}>
+          Sair
+        </button>
+      ) : (
+        <Link to="/login">
+          Entrar
+        </Link>
+      )}
+
+      <Link
+      className="anunciar"
+      to="/anunciar">
+        + Anunciar
+      </Link>
+
+    </div>
+
+    )}
+
+    {/* MOBILE */}
+
+    {isMobile && (
+
+      <>
+
+      <button
+      className="hamburger"
+      onClick={toggleMenu}>
+
+      ☰
+
+      </button>
+
+      {isOpen && (
+
+      <div className="mobile-menu">
+
+      <form
+      className="mobile-search"
+      onSubmit={handleSearch}>
+
+      <input
+      placeholder="Buscar..."
+      value={searchTerm}
+      onChange={(e)=>setSearchTerm(e.target.value)}
+      />
+
+      </form>
+
+      <Link to="/" onClick={closeMenu}>
+      🏠 Início
+      </Link>
+
+      <Link
+      to="/categoria/vendas"
+      onClick={closeMenu}>
+      📂 Categorias
+      </Link>
+
+      {isLoggedIn && (
+      <Link
+      to="/meus-anuncios"
+      onClick={closeMenu}>
+      📱 Meus anúncios
+      </Link>
+      )}
+
+      <Link
+      to="/contato"
+      onClick={closeMenu}>
+      ☎ Contato
+      </Link>
+
+      <Link
+      className="mobile-anunciar"
+      to="/anunciar">
+      ➕ Anunciar
+      </Link>
+
       </div>
 
-      {isMobile && isOpen && <div className="menu-overlay" onClick={closeMenu}></div>}
-    </nav>
-  )
+      )}
+
+      </>
+
+    )}
+
+  </div>
+
+</nav>
+)
 }
 
 export default Menu

@@ -1,5 +1,6 @@
 // backend/controllers/anuncios-controller.js
 const pool = require('../config/db');
+const anuncioService = require('../services/anuncioService');
 
 // Listar todos os anúncios
 async function listarAnuncios(req, res) {
@@ -64,38 +65,31 @@ async function buscarAnuncio(req, res) {
 // Criar novo anúncio (ATUALIZADO PARA SALVAR FOTOS AUTOMATICAMENTE)
 async function criarAnuncio(req, res) {
   try {
-    // 1. Pegar dados do texto
-    const { titulo, descricao, preco, categoria, localizacao } = req.body;
-    
-    // 2. Pegar os nomes dos arquivos que o Multer salvou (Vem do req.files)
-    // O map abaixo extrai apenas o nome do arquivo gerado: 'ad-123456789.png'
-    const nomesDasImagens = req.files ? req.files.map(file => file.filename) : [];
-    
-    console.log('📸 Imagens recebidas pelo servidor:', nomesDasImagens);
 
-    // 3. Salvar no banco
-    const resultado = await pool.query(
-      `INSERT INTO anuncios (titulo, descricao, preco, categoria, localizacao, imagens, usuario_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        titulo, 
-        descricao, 
-        preco, 
-        categoria, 
-        localizacao, 
-        JSON.stringify(nomesDasImagens), // Salva o array de nomes como STRING JSON
-        req.usuarioId || 1 // ID do usuário vindo do token
-      ]
+    if (!req.usuarioId) {
+      return res.status(401).json({
+        erro: 'Usuário não autenticado'
+      });
+    }
+
+    const anuncio = await anuncioService.criarAnuncio(
+      req.body,
+      req.files,
+      req.usuarioId
     );
-    
-    res.status(201).json({
+
+    return res.status(201).json({
       status: 'sucesso',
-      id: Number(resultado.insertId),
-      imagens: nomesDasImagens
+      id: anuncio.id,
+      imagens: anuncio.imagens
     });
+
   } catch (error) {
-    console.error('❌ Erro ao criar anúncio:', error.message);
-    res.status(500).json({ erro: error.message });
+    console.error('❌ Erro ao criar anúncio:', error);
+
+    return res.status(500).json({
+      erro: error.message
+    });
   }
 }
 
