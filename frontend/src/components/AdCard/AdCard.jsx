@@ -1,10 +1,12 @@
 import React from "react";
 import "./AdCard.css";
+import { useNavigate } from "react-router-dom";
 
 function AdCard({ ad }) {
   if (!ad) return null;
 
-  // Formatação de preço limpa
+  const navigate = useNavigate();
+
   const formatarPreco = (preco) => {
     if (!preco) return "0,00";
     const numero = Number(preco);
@@ -15,25 +17,18 @@ function AdCard({ ad }) {
         });
   };
 
-  // Mantendo sua lógica exata de busca de imagens do backend
   const getImagemUrl = () => {
-    if (ad.imagens && Array.isArray(ad.imagens) && ad.imagens.length > 0) {
-      return `http://localhost:3000/uploads/${ad.imagens[0]}`;
-    }
-    if (ad.imagens && typeof ad.imagens === "string") {
-      return `http://localhost:3000/uploads/${ad.imagens}`;
-    }
-    return null;
+    const img = ad.imagens?.[0];
+    if (!img) return null;
+
+    return `http://localhost:3000/uploads/${img}`;
   };
 
   const imageUrl = getImagemUrl();
 
   return (
-    <div
-      className="ad-card"
-      onClick={() => ad.id && (window.location.href = `/anuncio/${ad.id}`)}
-    >
-      {/* Container de Imagem Profissional com proporção fixa */}
+    <div className="ad-card" onClick={() => ad.id && navigate(`/anuncio/${ad.id}`)}>
+
       <div className="ad-card-image-wrapper">
         {imageUrl ? (
           <img
@@ -50,37 +45,34 @@ function AdCard({ ad }) {
             <span>📷 Sem foto</span>
           </div>
         )}
-        
-        {/* Botão de favorito estilizado por cima da imagem */}
-        <button 
+
+        <button
           className="ad-card-favorite"
-          onClick={(e) => {
-            e.stopPropagation(); // Evita clicar no card ao favoritar
-            // Lógica futura de favoritos aqui
-          }}
+          onClick={(e) => e.stopPropagation()}
         >
           🤍
         </button>
       </div>
 
-      {/* Corpo do Anúncio Organizado */}
       <div className="ad-card-content">
         <div className="ad-card-top">
           <div className="ad-card-price">
-            <span className="currency-symbol">R$</span> {formatarPreco(ad.preco)}
+            <span className="currency-symbol">R$</span>{" "}
+            {formatarPreco(ad.preco)}
           </div>
+
           <h2 className="ad-card-title" title={ad.titulo}>
             {ad.titulo || "Sem título"}
           </h2>
         </div>
 
-        {/* Rodapé com localização e categoria */}
         <div className="ad-card-footer">
           <span className="ad-card-location">
             📍 {ad.localizacao || "Itagi - BA"}
           </span>
+
           <span className="ad-card-category">
-            {ad.categoria || "Geral"}
+            {ad.categoria_slug || ad.categoria || "Geral"}
           </span>
         </div>
       </div>

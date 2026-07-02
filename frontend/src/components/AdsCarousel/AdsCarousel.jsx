@@ -1,32 +1,48 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./AdsCarousel.css";
 
-// Placeholder fora do componente para não recriar a cada render
-const PLACEHOLDER_IMG = 'https://via.placeholder.com/600x400?text=Imagem+Indisponível';
+const PLACEHOLDER_IMG =
+  "https://via.placeholder.com/600x400?text=Imagem+Indisponível";
 
 function AdsCarousel({ ads = [] }) {
   const [index, setIndex] = useState(0);
   const [imageErrors, setImageErrors] = useState({});
+  const [animating, setAnimating] = useState(false);
 
-  // Avança automaticamente com segurança
+  const startX = useRef(0);
+  const endX = useRef(0);
+
+  // 🔁 autoplay seguro
   useEffect(() => {
-    // Se não houver anúncios ou apenas 1, não precisa de carrossel rodando
     if (!ads || ads.length <= 1) return;
 
     const timer = setInterval(() => {
       setIndex((current) => (current + 1) % ads.length);
     }, 4000);
 
-    // Limpeza fundamental para não travar a memória ou o timer
     return () => clearInterval(timer);
-  }, [ads.length]); // Monitora apenas o tamanho da lista
+  }, [ads.length]);
 
-  // Resetar erros de imagem quando mudar de índice
+  // 🧠 reset erro imagem ao trocar
   useEffect(() => {
-    setImageErrors(prev => ({ ...prev, [index]: false }));
+    setImageErrors((prev) => ({ ...prev, [index]: false }));
   }, [index]);
 
-  // Se não tem anúncios
+  // ⚡ preload imagens
+  useEffect(() => {
+    if (!ads?.length) return;
+
+    ads.forEach((ad) => {
+      const img = ad?.imagens?.[0];
+      if (img) {
+        const pre = new Image();
+        pre.src = img.startsWith("http")
+          ? img
+          : `http://localhost:3000/uploads/${img}`;
+      }
+    });
+  }, [ads]);
+
   if (!ads || ads.length === 0) {
     return (
       <div className="carousel-empty">
@@ -35,70 +51,99 @@ function AdsCarousel({ ads = [] }) {
     );
   }
 
-  // Garantir que o índice está dentro dos limites
   const safeIndex = Math.min(index, ads.length - 1);
   const ad = ads[safeIndex];
 
-  // Função melhorada para evitar erros de leitura de imagem
+  // 🖼 imagem limpa
   const getImagemUrl = () => {
-    // Verifica se há erro de carregamento para esta imagem
-    if (imageErrors[safeIndex]) {
-      return PLACEHOLDER_IMG;
-    }
+    const img = ad?.imagens?.[0];
 
-    // Verifica se o anúncio e as imagens existem
-    if (ad && ad.imagens && Array.isArray(ad.imagens) && ad.imagens.length > 0) {
-      const foto = ad.imagens[0];
-      if (foto && typeof foto === 'string') {
-        // Se já for uma URL completa (http...), usa direto, senão monta o link do backend
-        return foto.startsWith('http') ? foto : `http://localhost:3000/uploads/${foto}`;
-      }
-    }
-    return PLACEHOLDER_IMG;
+    if (imageErrors[safeIndex]) return PLACEHOLDER_IMG;
+    if (!img) return PLACEHOLDER_IMG;
+
+    return img.startsWith("http")
+      ? img
+      : `http://localhost:3000/uploads/${img}`;
   };
 
+  // 💰 preço formatado
   const formatarPreco = (preco) => {
-    const valor = parseFloat(preco);
-    return isNaN(valor) ? '0,00' : valor.toLocaleString('pt-BR', { 
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2 
-    });
+    const valor = Number(preco);
+    return isNaN(valor)
+      ? "0,00"
+      : valor.toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        });
   };
 
-  // Handlers com validação
-  const handlePrev = () => {
-    setIndex((current) => (current - 1 + ads.length) % ads.length);
-  };
-
+  // ⬅️➡️ navegação com lock anti spam
   const handleNext = () => {
+    if (animating) return;
+
+    setAnimating(true);
     setIndex((current) => (current + 1) % ads.length);
+
+    setTimeout(() => setAnimating(false), 350);
+  };
+
+  const handlePrev = () => {
+    if (animating) return;
+
+    setAnimating(true);
+    setIndex((current) => (current - 1 + ads.length) % ads.length);
+
+    setTimeout(() => setAnimating(false), 350);
+  };
+
+  // 📱 swipe mobile
+  const handleTouchStart = (e) => {
+    startX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    endX.current = e.changedTouches[0].clientX;
+
+    const diff = startX.current - endX.current;
+
+    if (Math.abs(diff) < 50) return;
+
+    diff > 0 ? handleNext() : handlePrev();
   };
 
   const handleImageError = () => {
-    setImageErrors(prev => ({ ...prev, [safeIndex]: true }));
+    setImageErrors((prev) => ({
+      ...prev,
+      [safeIndex]: true,
+    }));
   };
 
   return (
     <div className="carousel-container">
-      <div className="carousel-card">
+      <div
+        className="carousel-card"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* imagem */}
         <div className="image-wrapper">
           <img
             src={getImagemUrl()}
-            alt={ad?.titulo || 'Anúncio'}
-            key={safeIndex} // Ajuda o React a saber que a imagem mudou para animar
+            alt={ad?.titulo || "Anúncio"}
+            key={ad?.id || safeIndex}
             onError={handleImageError}
             loading="lazy"
           />
         </div>
 
+        {/* info */}
         <div className="carousel-info">
-          <h3>{ad?.titulo || 'Sem título'}</h3>
+          <h3>{ad?.titulo || "Sem título"}</h3>
           <p className="preco">R$ {formatarPreco(ad?.preco)}</p>
-          <p className="local">📍 {ad?.localizacao || 'Itagi'}</p>
+          <p className="local">📍 {ad?.localizacao || "Itagi"}</p>
         </div>
       </div>
 
-      {/* Setas Manuais - só mostra se tiver mais de 1 anúncio */}
+      {/* setas */}
       {ads.length > 1 && (
         <>
           <button
@@ -108,6 +153,7 @@ function AdsCarousel({ ads = [] }) {
           >
             ‹
           </button>
+
           <button
             className="seta seta-direita"
             onClick={handleNext}
@@ -116,20 +162,6 @@ function AdsCarousel({ ads = [] }) {
             ›
           </button>
         </>
-      )}
-
-      {/* Indicadores (Bolinhas) - só mostra se tiver mais de 1 anúncio */}
-      {ads.length > 1 && (
-        <div className="dots">
-          {ads.map((_, i) => (
-            <button
-              key={i}
-              className={`dot ${i === safeIndex ? 'active' : ''}`}
-              onClick={() => setIndex(i)}
-              aria-label={`Ir para anúncio ${i + 1}`}
-            />
-          ))}
-        </div>
       )}
     </div>
   );
