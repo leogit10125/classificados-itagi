@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom"
 import Menu from "./components/Menu/Menu"
-import Footer from "./components/Footer/Footer"
+import Footer from "./components/layout/Footer";
 import ScrollToTop from "./components/ScrollToTop"
 
 // Pages

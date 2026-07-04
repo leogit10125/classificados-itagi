@@ -154,6 +154,8 @@ function AdsCarousel({ ads = [] }) {
             ‹
           </button>
 
+          //
+
           <button
             className="seta seta-direita"
             onClick={handleNext}

@@ -1,0 +1,31 @@
+:root {
+
+  /* Cores principais */
+  --primary: #0057B8;        /* Azul */
+  --primary-dark: #003F88;
+
+  --secondary: #009B3A;      /* Verde */
+  --secondary-dark: #00752C;
+
+  --accent: #FFD447;         /* Amarelo */
+
+  /* Neutras */
+  --background: #F7F8FA;
+  --surface: #FFFFFF;
+
+  --text: #1F2937;
+  --text-light: #6B7280;
+
+  --border: #E5E7EB;
+
+  /* Sombras */
+  --shadow:
+      0 8px 20px rgba(0,0,0,.08);
+
+  --shadow-hover:
+      0 15px 35px rgba(0,0,0,.12);
+
+  /* Bordas */
+  --radius:16px;
+
+}

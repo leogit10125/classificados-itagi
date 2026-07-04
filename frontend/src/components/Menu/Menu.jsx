@@ -74,7 +74,9 @@ function Menu() {
           value={searchTerm}
           onChange={(e)=>setSearchTerm(e.target.value)}
         />
-        <button>🔍</button>
+        <button className="btn btn-primary btn-md">
+    📢 Anunciar
+</button>
       </form>
     )}
 

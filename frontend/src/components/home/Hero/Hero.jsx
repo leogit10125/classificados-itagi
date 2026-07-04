@@ -1,7 +1,7 @@
 // src/components/Hero/Hero.jsx
 import { useState, useEffect } from "react"; // 👈 Adiciona useEffect
 import { useNavigate } from "react-router-dom";
-import { getStats } from "../../services/statsService"; // 👈 Importa o serviço
+import { getStats } from "../../../services/statsService"; // 👈 Importa o serviço
 import "./Hero.css";
 
 function Hero() {
@@ -12,6 +12,12 @@ function Hero() {
     categorias: 0
   }); // 👈 Estado para os stats
   const navigate = useNavigate();
+  const [busca, setBusca] = useState("");
+  const pesquisar = () => {
+    if (!busca.trim()) return;
+
+    navigate(`/buscar?q=${encodeURIComponent(busca)}`);
+  };
 
   // 👇 BUSCA OS NÚMEROS REAIS DO BANCO!
   useEffect(() => {
@@ -61,19 +67,22 @@ function Hero() {
         
         <div className="hero-search">
           <input
-            type="text"
-            placeholder="Digite sua busca aqui"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="hero-search-input"
+              type="text"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              placeholder="O que você procura?"
+              className="hero-search-input"
+              onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                      pesquisar();
+                  }
+             }}
           />
-          <button 
-            className="hero-search-button"
-            onClick={handleSearch}
+          <button
+              className="btn btn-primary btn-lg"
+              onClick={pesquisar}
           >
-            <span>Buscar</span>
-            <svg>...ícone de busca...</svg>
+              🔍 Buscar
           </button>
         </div>
         

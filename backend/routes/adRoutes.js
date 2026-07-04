@@ -6,6 +6,7 @@ const authMiddleware = require('../middleware/auth');
 const checkAdLimit = require('../middleware/checkAdLimit');
 const fs = require('fs'); 
 const path = require('path'); 
+const creditService = require("../services/creditService");
 
 // =====================================
 // SLUGIFY (PADRÃO DO SISTEMA)
@@ -160,46 +161,80 @@ router.get('/:id', async (req, res) => {
 // =====================================
 // CRIAR ANÚNCIO
 // =====================================
-router.post('/', authMiddleware, checkAdLimit, upload.array('imagens', 5), async (req, res) => {
-  try {
-    const usuarioId = req.usuario?.id;
-    const { titulo, descricao, preco, categoria, localizacao } = req.body;
+router.post(
+  '/',
+  authMiddleware,
+  checkAdLimit,
+  upload.array('imagens', 5),
+  async (req, res) => {
+    try {
+      const usuarioId = req.usuario?.id;
+      const { titulo, descricao, preco, categoria, localizacao } = req.body;
 
-    if (!usuarioId) {
-      return res.status(401).json({ error: 'Não autenticado' });
+      if (!usuarioId) {
+        return res.status(401).json({
+          error: 'Não autenticado'
+        });
+      }
+
+      const imagensArray = req.files?.map(file => file.filename) || [];
+
+      // Gera o slug da categoria
+      const categoriaSlug = slugify(categoria);
+
+      // Salva o anúncio
+      const [result] = await db.query(
+        `
+        INSERT INTO anuncios
+        (
+          titulo,
+          descricao,
+          preco,
+          categoria,
+          categoria_slug,
+          localizacao,
+          imagens,
+          usuario_id,
+          criado_em
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        `,
+        [
+          titulo,
+          descricao,
+          parseFloat(preco),
+          categoria,
+          categoriaSlug,
+          localizacao,
+          JSON.stringify(imagensArray),
+          usuarioId
+        ]
+      );
+
+      // Consome um crédito (gratuito ou pago)
+      await creditService.consumirCredito(
+        usuarioId,
+        req.adType
+      );
+
+      return res.status(201).json({
+        success: true,
+        id: result.insertId,
+        categoria_slug: categoriaSlug,
+        imagens: imagensArray,
+        tipoCredito: req.adType
+      });
+
+    } catch (error) {
+      console.error('Erro ao criar anúncio:', error);
+
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      });
     }
-
-    const imagensArray = req.files?.map(f => f.filename) || [];
-
-    // 🔥 AQUI ESTÁ O PONTO PRINCIPAL
-    const categoriaSlug = slugify(categoria);
-
-    const [result] = await db.query(`
-      INSERT INTO anuncios 
-      (titulo, descricao, preco, categoria, categoria_slug, localizacao, imagens, usuario_id, criado_em)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-    `, [
-      titulo,
-      descricao,
-      parseFloat(preco),
-      categoria,
-      categoriaSlug,
-      localizacao,
-      JSON.stringify(imagensArray),
-      usuarioId
-    ]);
-
-    res.status(201).json({
-      success: true,
-      id: result.insertId,
-      categoria_slug: categoriaSlug,
-      imagens: imagensArray
-    });
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
-});
+);
 
 // =====================================
 // EDITAR ANÚNCIO

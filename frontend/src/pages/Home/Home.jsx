@@ -1,6 +1,6 @@
 // src/pages/Home/Home.jsx
 import React, { useEffect, useState } from 'react';
-import Hero from '../../components/Hero/Hero';
+import Hero from '../../components/home/Hero';
 import Categories from '../../components/Categories/Categories';
 import AdsCarousel from '../../components/AdsCarousel/AdsCarousel';
 import './Home.css';
