@@ -1,109 +1,113 @@
-// src/components/Hero/Hero.jsx
-import { useState, useEffect } from "react"; // 👈 Adiciona useEffect
+// src/components/home/Hero/Hero.jsx
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getStats } from "../../../services/statsService"; // 👈 Importa o serviço
+import { getStats } from "../../../services/statsService";
 import "./Hero.css";
 
 function Hero() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  const [busca, setBusca] = useState("");
+
   const [stats, setStats] = useState({
     anuncios: 0,
     usuarios: 0,
-    categorias: 0
-  }); // 👈 Estado para os stats
-  const navigate = useNavigate();
-  const [busca, setBusca] = useState("");
-  const pesquisar = () => {
-    if (!busca.trim()) return;
+    categorias: 0,
+  });
 
-    navigate(`/buscar?q=${encodeURIComponent(busca)}`);
-  };
-
-  // 👇 BUSCA OS NÚMEROS REAIS DO BANCO!
   useEffect(() => {
-    const carregarStats = async () => {
-      const dados = await getStats();
-      setStats(dados);
-      console.log('📊 Stats reais:', dados); // Vê no console
-    };
+    async function carregarStats() {
+      try {
+        const dados = await getStats();
+        setStats(dados);
+        console.log("📊 Stats:", dados);
+      } catch (erro) {
+        console.error("Erro ao carregar estatísticas:", erro);
+      }
+    }
+
     carregarStats();
-  }, []); // Array vazio = executa só uma vez quando carrega
+  }, []);
 
-  const handleSearch = () => {
-    if (searchTerm.trim()) {
-      console.log('🔍 Navegando para buscar:', searchTerm);
-      navigate(`/buscar?q=${encodeURIComponent(searchTerm)}`);
-    } else {
-      alert('Digite algo para buscar!');
-    }
-  };
+  function pesquisar() {
+    const termo = busca.trim();
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
+    if (!termo) return;
 
-  // 👇 Função para formatar números (ex: 1234 -> 1.2k+)
-  const formatarNumero = (num) => {
+    navigate(`/buscar?q=${encodeURIComponent(termo)}`);
+  }
+
+  function formatarNumero(num) {
     if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'k+';
+      return (num / 1000).toFixed(1) + "k+";
     }
-    return num + '+';
-  };
+
+    return `${num}+`;
+  }
 
   return (
     <section className="hero">
       <div className="hero-overlay"></div>
+
       <div className="hero-content">
         <h1 className="hero-title">
           <span className="hero-title-main">Itagi</span>
           <span className="hero-title-sub">Classificados</span>
         </h1>
-        
+
         <p className="hero-description">
-          Compre, venda e anuncie em Itagi e região
+          Compre, venda e anuncie em Itagi e toda a região.
         </p>
-        
+
         <div className="hero-search">
           <input
-              type="text"
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              placeholder="O que você procura?"
-              className="hero-search-input"
-              onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                      pesquisar();
-                  }
-             }}
+            type="text"
+            className="hero-search-input"
+            placeholder="O que você procura?"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                pesquisar();
+              }
+            }}
           />
+
           <button
-              className="btn btn-primary btn-lg"
-              onClick={pesquisar}
+            className="hero-search-button"
+            onClick={pesquisar}
           >
-              🔍 Buscar
+            🔍 Buscar
           </button>
         </div>
-        
+
         <div className="hero-stats">
           <div className="hero-stat">
             <span className="hero-stat-number">
               {formatarNumero(stats.anuncios)}
             </span>
-            <span className="hero-stat-label">ANÚNCIOS</span>
+            <span className="hero-stat-label">
+              Anúncios
+            </span>
           </div>
+
           <div className="hero-stat">
             <span className="hero-stat-number">
               {formatarNumero(stats.usuarios)}
             </span>
-            <span className="hero-stat-label">USUÁRIOS</span>
+            <span className="hero-stat-label">
+              Usuários
+            </span>
           </div>
+
           <div className="hero-stat">
             <span className="hero-stat-number">
               {formatarNumero(stats.categorias)}
             </span>
-            <span className="hero-stat-label">CATEGORIAS</span>
+            <span className="hero-stat-label">
+              Categorias
+            </span>
           </div>
         </div>
       </div>

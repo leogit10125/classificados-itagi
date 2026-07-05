@@ -36,7 +36,33 @@ padding:0 20px;
 }
 
 /* LOGO */
+.logo{
 
+    display:flex;
+
+    align-items:center;
+
+    text-decoration:none;
+
+}
+
+.logo-image{
+
+    width:55px;
+
+    height:55px;
+
+    object-fit:contain;
+
+    transition:.3s;
+
+}
+
+.logo-image:hover{
+
+    transform:scale(1.08);
+
+}
 .logo{
 
 display:flex;
