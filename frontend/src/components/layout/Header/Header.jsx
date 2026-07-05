@@ -1,24 +1,61 @@
-// src/components/Header/Header.jsx 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useNavigate, Link } from "react-router-dom"
 import "./Header.css"
 
 function Header() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [scrolled, setScrolled] = useState(false)
   const navigate = useNavigate()
 
-  const handleSearch = (e) => {
-    e.preventDefault() // 👈 IMPEDE O RECARREGAMENTO DA PÁGINA
-    
-    if (searchTerm.trim()) {
-      console.log('🔍 Buscando por:', searchTerm)
-      // 👈 NAVEGA PARA A PÁGINA DE RESULTADOS
-      navigate(`/buscar?q=${encodeURIComponent(searchTerm.trim())}`)
-    } else {
-      alert('Digite algo para buscar')
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
     }
-  } 
 
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+
+    if (searchTerm.trim()) {
+      navigate(`/buscar?q=${encodeURIComponent(searchTerm.trim())}`)
+    }
+  }
+
+  return (
+    <header className={`header ${scrolled ? "header-scrolled" : ""}`}>
+
+      <div className="header-logo">
+        📍 ITAGI <span>Classificados</span>
+      </div>
+
+      <nav className="header-nav">
+        <Link to="/">🏠 Início</Link>
+        <Link to="/categorias">📂 Categorias</Link>
+        <Link to="/contato">☎ Contato</Link>
+        <Link to="/perfil">👤 Meu Perfil</Link>
+
+        <Link to="/anunciar" className="btn btn-primary btn-sm">
+          ➕ Anunciar
+        </Link>
+      </nav>
+
+      <form onSubmit={handleSearch} className="header-search">
+        <input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Buscar anúncios..."
+        />
+
+        <button className="btn btn-primary btn-sm">
+          🔍
+        </button>
+      </form>
+
+    </header>
+  )
 }
 
-export default Header  
+export default Header

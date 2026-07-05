@@ -23,6 +23,7 @@ import Sobre from "./pages/institucional/Sobre"
 import Politicas from "./pages/institucional/Politicas"
 import Termos from "./pages/institucional/Termos"
 import Contato from "./pages/institucional/Contato"
+import Profile from "./pages/Profile/Profile";
 
 // Blog
 import Blog from "./pages/Blog/Blog"
@@ -43,6 +44,7 @@ function App() {
         <Route path="/buscar" element={<SearchResults />} />
         <Route path="/editar-anuncio/:id" element={<EditarAnuncio />} />
         <Route path="/meus-anuncios" element={<MeusAnuncios />} />
+        <Route path="/perfil" element={<Profile />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />

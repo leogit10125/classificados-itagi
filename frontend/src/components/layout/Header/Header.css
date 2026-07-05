@@ -1,145 +1,104 @@
-/* src/components/Header/Header.css */
+/* =====================================================
+   HEADER PROFISSIONAL - ITAGI CLASSIFICADOS
+===================================================== */
+
 .header {
-  background: linear-gradient(135deg, #3651cb 0%, #3a56d4 100%);
-  color: rgb(214, 130, 130);
-  padding: 30px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 20px;
+
+    background: #fff;
+
+    transition: all .25s ease;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+/* efeito ao rolar */
+.header-scrolled {
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
 }
 
-.header-content {
-  text-align: center;
-  margin-bottom: 25px;
+/* LOGO */
+.header-logo {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #F57C00;
 }
 
-.logo-area {
-  margin-bottom: 10px;
+.header-logo span {
+    color: #222;
+    font-weight: 600;
 }
 
-.logo-area h1 {
-  font-size: 48px;
-  margin: 0;
-  font-weight: 800;
-  display: inline;
-  color: white;
+/* NAV */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 18px;
 }
 
-.logo-area span {
-  font-size: 24px;
-  margin-left: 10px;
-  font-weight: 300;
-  opacity: 0.9;
+.header-nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: .2s;
 }
 
-.slogan {
-  font-size: 18px;
-  opacity: 0.9;
-  margin: 0;
+.header-nav a:hover {
+    color: #F57C00;
 }
 
-/* Busca */
-.search-container {
-  max-width: 600px;
-  margin: 0 auto 30px;
-  display: flex;
-  gap: 10px;
+/* botão anunciar */
+.btn-anunciar {
+    box-shadow: 0 6px 16px rgba(245,124,0,.25);
 }
 
-.search-input {
-  flex: 1;
-  padding: 15px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  outline: none;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+/* BUSCA */
+.header-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.search-input:focus {
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+.header-search input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+    transition: .2s;
 }
 
-.search-button {
-  background: #130404;
-  color: rgb(29, 28, 28);
-  border: none;
-  padding: 0 30px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+.header-search input:focus {
+    border-color: #F57C00;
+    box-shadow: 0 0 0 2px rgba(245,124,0,.15);
 }
 
-.search-button:hover {
-  background: #1f0f0f;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-}
-
-/* Estatísticas */
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 60px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-item strong {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
-.stat-item span {
-  font-size: 14px;
-  opacity: 0.8;
-  letter-spacing: 1px;
-}
-
-/* Responsivo */
+/* RESPONSIVO */
 @media (max-width: 768px) {
-  .logo-area h1 {
-    font-size: 32px;
-    display: block;
-  }
-  
-  .logo-area span {
-    font-size: 18px;
-    margin-left: 0;
-    display: block;
-  }
-  
-  .slogan {
-    font-size: 14px;
-    padding: 0 20px;
-  }
-  
-  .search-container {
-    flex-direction: column;
-    margin: 0 20px 30px;
-  }
-  
-  .search-button {
-    padding: 12px;
-  }
-  
-  .stats {
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .stat-item strong {
-    font-size: 24px;
-  }
+
+    .header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .header-nav {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .header-search {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .header-search input {
+        width: 70%;
+    }
 }

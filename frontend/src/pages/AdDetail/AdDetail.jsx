@@ -140,12 +140,23 @@ function AdDetail() {
             </div>
             
             <div className="ad-actions">
+
+              <a
+                href={`https://wa.me/55${anuncio.telefone || anuncio.phone}?text=Olá! Vi seu anúncio "${anuncio.titulo}" no Itagi Classificados e tenho interesse.`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-success btn-md hover-lift"
+              >
+               📱 Falar no WhatsApp
+              </a>
+
               <button 
                 className="btn-back"
                 onClick={() => window.history.back()}
               >
                 ← Voltar
               </button>
+
             </div>
           </div>
         </div>
