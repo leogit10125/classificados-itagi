@@ -1,17 +1,16 @@
-import { Routes, Route } from "react-router-dom"
-import Menu from "./components/Menu/Menu"
-import Footer from "./components/Footer/Footer"
-import ScrollToTop from "./components/ScrollToTop"
+import { Routes, Route } from "react-router-dom";
+import Menu from "./components/layout/Menu/Menu";
+import Footer from "./components/layout/Footer/Footer";
+//import ScrollToTop from "./components/ScrollToTop";
 
-// Pages
-import Home from "./pages/Home"
-import CategoryPage from "./pages/CategoryPage"
-import AdDetail from "./pages/AdDetail"
-import Anunciar from "./pages/Anunciar"
-import SearchResults from './pages/SearchResults/SearchResults'
-import EditarAnuncio from './pages/EditarAnuncio'
-import MeusAnuncios from "./pages/MeusAnuncios/MeusAnuncios"
-
+// Pages (Apontando para a pasta correta da Home)
+import Home from "./pages/Home/Home"; 
+import CategoryPage from "./pages/CategoryPage";
+import AdDetail from "./pages/AdDetail";
+import Anunciar from "./pages/Anunciar";
+import SearchResults from './pages/SearchResults/SearchResults';
+import EditarAnuncio from './pages/EditarAnuncio';
+import MeusAnuncios from "./pages/MeusAnuncios/MeusAnuncios";
 // Auth
 import Login from "./pages/Auth/Login"
 import Registro from "./pages/Auth/Registro"
@@ -32,7 +31,6 @@ import Categoria from "./pages/Blog/Categoria"
 function App() {
   return (
     <>
-      <ScrollToTop />
       <Menu />
 
       <Routes>
@@ -63,5 +61,6 @@ function App() {
     </>
   )
 }
+
 
 export default App

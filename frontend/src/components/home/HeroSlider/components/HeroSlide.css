@@ -1,0 +1,47 @@
+.hero-slide{
+
+    display:grid;
+
+    grid-template-columns:60% 40%;
+
+    gap:32px;
+
+    align-items:stretch;
+
+    max-width:1400px;
+
+    margin:auto;
+
+    padding:40px;
+
+}
+
+.hero-slide-image{
+
+    min-height:520px;
+
+}
+
+.hero-slide-info{
+
+    display:flex;
+
+}
+
+@media(max-width:992px){
+
+.hero-slide{
+
+    grid-template-columns:1fr;
+
+    padding:20px;
+
+}
+
+.hero-slide-image{
+
+    min-height:320px;
+
+}
+
+}

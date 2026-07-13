@@ -1,5 +1,6 @@
 // backend/scripts/setup-banco.js
 const mysql = require('mysql2/promise');
+const bcrypt = require('bcrypt');
 
 async function setupBanco() {
   let connection;
@@ -9,10 +10,11 @@ async function setupBanco() {
     
    // Linha 11 do seu arquivo - Substitua por esta:
    connection = await mysql.createConnection({
-    host: '127.0.0.1',
-    user: 'root',
-    password: 'root',
-    port: 3306
+    host: process.env.DB_HOST || 'mysql',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'root',
+    database: process.env.DB_NAME || 'itagi_classificados',
+    port: process.env.DB_PORT || 3306
    });
     
     console.log('✅ Conectado ao MySQL');
@@ -32,12 +34,13 @@ async function setupBanco() {
     // Tabela de usuários
     await connection.query(`
       CREATE TABLE IF NOT EXISTS usuarios (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        nome VARCHAR(255) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        telefone VARCHAR(20),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          nome VARCHAR(255) NOT NULL,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          telefone VARCHAR(20),
+          senha VARCHAR(255) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
     `);
     console.log('✅ Tabela "usuarios" criada');
     
@@ -77,13 +80,44 @@ async function setupBanco() {
     console.log('\n👤 Inserindo usuários...');
     
     // Inserir usuários
-    const [usuariosResult] = await connection.query(`
-      INSERT INTO usuarios (nome, email, telefone) VALUES 
-      ('Leone', 'leone@email.com', '11999999999'),
-      ('Admin', 'admin@email.com', '11988888888'),
-      ('João Silva', 'joao@email.com', '11977777777'),
-      ('Maria Santos', 'maria@email.com', '11966666666')
-    `);
+    console.log('\n👤 Inserindo usuários...');
+
+    // senha padrão: 123456
+    const senhaHash = await bcrypt.hash('123456', 10);
+
+    const [usuariosResult] = await connection.query(
+      `
+      INSERT INTO usuarios
+      (nome, email, telefone, senha)
+      VALUES
+      (?, ?, ?, ?),
+      (?, ?, ?, ?),
+      (?, ?, ?, ?),
+      (?, ?, ?, ?)
+      `,
+      [
+        'Leone',
+        'leone@email.com',
+        '11999999999',
+        senhaHash,
+
+        'Admin',
+        'admin@email.com',
+        '11988888888',
+        senhaHash,
+
+        'João Silva',
+        'joao@email.com',
+        '11977777777',
+        senhaHash,
+
+        'Maria Santos',
+        'maria@email.com',
+        '11966666666',
+        senhaHash
+      ]
+    );
+
     console.log(`✅ ${usuariosResult.affectedRows} usuários inseridos`);
     
     // =====================================

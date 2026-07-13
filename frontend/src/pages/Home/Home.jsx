@@ -1,8 +1,9 @@
 // src/pages/Home/Home.jsx
+// src/pages/Home/Home.jsx
 import React, { useEffect, useState } from 'react';
-import Hero from '../../components/Hero/Hero';
-import Categories from '../../components/Categories/Categories';
-import AdsCarousel from '../../components/AdsCarousel/AdsCarousel';
+import HeroSlider from '../../components/home/HeroSlider/HeroSlider';
+import Categories from '../../components/home/Categories/Categories';
+import AdsCarousel from '../../components/ads/AdsCarousel/AdsCarousel';
 import './Home.css';
 
 const API_URL = 'http://localhost:3000/api';
@@ -48,7 +49,7 @@ function Home() {
   return (
     <div className="home-page">
       {/* HERO SECTION */}
-      <Hero />
+      <HeroSlider />
       
       {/* CATEGORIAS */}
       <Categories />

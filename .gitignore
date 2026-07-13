@@ -15,3 +15,6 @@ backup-*/
 
 # Arquivos temporários
 *.bak
+
+dist/
+coverage/

@@ -1,0 +1,97 @@
+/* Container Geral da Seção */
+.categories-section {
+  padding: 15px 10px !important;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Título Sutil */
+.categories-section h2 {
+  font-size: 14px !important;
+  color: #1e293b;
+  margin-bottom: 10px !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Grade em 4 Colunas */
+.categories-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 8px !important;
+}
+
+/* O Card Ultra Compactado (Altura cortada drasticamente) */
+.category-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 58px !important; /* Cortamos para 58px para ficar bem baixinho e horizontal */
+  padding: 4px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.category-card:hover {
+  background: #ffffff !important;
+  border-color: #2563eb !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Círculo do Ícone bem menor e colado ao texto */
+.category-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important; /* Emoji menor e mais delicado */
+  margin-bottom: 2px !important; /* Quase nenhum espaço abaixo dele */
+  background: #eff6ff !important;
+  width: 28px !important; /* Círculo reduzido para achatar o botão */
+  height: 28px !important;
+  border-radius: 50% !important;
+  color: inherit !important;
+}
+
+.category-card:hover .category-icon {
+  background: #dbeafe !important;
+}
+
+/* Texto da Categoria */
+.category-name {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  width: 100% !important;
+}
+
+/* Remove contadores antigos por garantia */
+.category-card span:nth-child(3), 
+.category-card small,
+.category-card p {
+  display: none !important;
+}
+
+/* Ajuste extremo para telas minúsculas */
+@media (max-width: 360px) {
+  .category-card {
+    height: 52px !important;
+  }
+  .category-icon {
+    font-size: 14px !important;
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .category-name {
+    font-size: 10px !important;
+  }
+}

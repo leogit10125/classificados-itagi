@@ -1,7 +1,7 @@
 // src/pages/SearchResults/SearchResults.jsx
 import { useState, useEffect } from "react"
 import { useSearchParams, Link } from "react-router-dom"  
-import AdCard from "../../components/AdCard/AdCard"
+import AdCard from "../../components/ads/AdCard/AdCard"; //  Novo com /ads/
 import "./SearchResults.css"
 
 const API_URL = 'http://localhost:3000/api'

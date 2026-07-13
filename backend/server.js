@@ -75,7 +75,7 @@ if (authRoutes && typeof authRoutes === 'function') {
 }
 
 if (adRoutes && typeof adRoutes === 'function') {
-    app.use('/api/ads', adRoutes);
+    app.use("/api/ads", adRoutes);
     console.log('✅ Rota /api/ads carregada');
 }
 

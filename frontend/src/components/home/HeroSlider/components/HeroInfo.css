@@ -1,0 +1,116 @@
+.hero-info{
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    padding:48px;
+
+    background:#ffffff;
+
+    height:100%;
+
+}
+
+.hero-badge{
+
+    display:inline-flex;
+    width:max-content;
+
+    background:#fff4d6;
+
+    color:#d97706;
+
+    padding:6px 14px;
+
+    border-radius:999px;
+
+    font-size:.85rem;
+
+    font-weight:700;
+
+    margin-bottom:18px;
+
+}
+
+.hero-category{
+
+    color:#2563eb;
+
+    font-weight:600;
+
+    margin-bottom:8px;
+
+}
+
+.hero-title{
+
+    font-size:2.3rem;
+
+    font-weight:700;
+
+    color:#111827;
+
+    margin-bottom:18px;
+
+}
+
+.hero-description{
+
+    color:#6b7280;
+
+    line-height:1.8;
+
+    margin-bottom:28px;
+
+}
+
+.hero-price{
+
+    font-size:2rem;
+
+    font-weight:700;
+
+    color:#16a34a;
+
+    margin-bottom:16px;
+
+}
+
+.hero-location{
+
+    color:#64748b;
+
+    margin-bottom:30px;
+
+}
+
+.hero-button{
+
+    width:max-content;
+
+    padding:15px 34px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2563eb;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.hero-button:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-2px);
+
+}
