@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import FeaturedAdsV2 from "../../components/ads/FeaturedAdsV2";
 
 //import HeroSlider from "../../components/home/HeroSlider/HeroSlider";
-import HeroPremium from "../../components/home/HeroPremium/HeroPremium";
+import Hero from "../../components/home/Hero/Hero";
 import Categories from "../../components/home/Categories/Categories";
 //import AdsCarousel from "../../components/ads/AdsCarousel/AdsCarousel";
 
@@ -58,7 +58,7 @@ function Home() {
         <div className="home-page">
 
             
-            <HeroPremium />
+            <Hero />
 
             <Categories />
 

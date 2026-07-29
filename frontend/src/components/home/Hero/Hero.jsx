@@ -7,7 +7,7 @@ import HeroImageCard from "./components/HeroImageCard";
 import HeroPriceBox from "./components/HeroPriceBox";
 import HeroDots from "./components/HeroDots";
 
-import "./HeroPremium.css";
+import "./Hero.css";
 
 function HeroPremium() {
 
