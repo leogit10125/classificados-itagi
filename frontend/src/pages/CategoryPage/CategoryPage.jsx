@@ -1,443 +1,182 @@
-// src/pages/CategoryPage/CategoryPage.jsx
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
 
-import { useState, useEffect } from "react"
-import { useParams, Link } from "react-router-dom"
-import AdCard from "../../components/ads/AdCard/AdCard"; //  Caminho atualizado com /ads/
-import "./CategoryPage.css"
+import AdCard from "../../components/ads/AdCard/AdCard";
+import { UPLOADS_URL } from "../../config/api";
+import { CategoriasAPI } from "../../api";
 
-const API_URL = "http://localhost:3000/api"
+
 
 function CategoryPage() {
 
-  const { slug } = useParams()
+    const { slug } = useParams();
 
-  const [categoryAds, setCategoryAds] = useState([])
-  const [categoryInfo, setCategoryInfo] = useState(null)
-  const [sortBy, setSortBy] = useState("recent")
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+    const [categoryAds, setCategoryAds] = useState([]);
+    const [categoryInfo, setCategoryInfo] = useState(null);
+    const [sortBy, setSortBy] = useState("recent");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
+   
 
-  const categoriesMap = {
+    const carregarCategoria = useCallback(async () => {
 
-    vendas: {
-      name: "Vendas",
-      icon: "🛒"
-    },
+        try {
 
-    servicos: {
-      name: "Serviços",
-      icon: "🔧"
-    },
+            setLoading(true);
 
-    imoveis: {
-      name: "Imóveis",
-      icon: "🏠"
-    },
+            const ads = await CategoriasAPI.slug(slug);
 
-    empregos: {
-      name: "Empregos",
-      icon: "💼"
-    },
+            setCategoryAds(Array.isArray(ads) ? ads : []);
 
-    veiculos: {
-      name: "Veículos",
-      icon: "🚗"
-    },
+            setCategoryInfo(
 
-    eletronicos: {
-      name: "Eletrônicos",
-      icon: "📱"
-    }
+                categoriesMap[slug] || {
 
-  }
+                    name: slug.charAt(0).toUpperCase() + slug.slice(1),
 
+                    icon: "📂"
 
-  useEffect(() => {
+                }
 
-    const fetchCategoryAds = async () => {
+            );
 
-      setLoading(true)
-      setError(null)
+            setError(null);
 
-      try {
+        } catch (err) {
 
-        console.log(
-          `🔍 Buscando anúncios da categoria: ${slug}`
-        )
+            console.error(err);
 
+            setError(err.message || "Erro ao carregar categoria.");
 
-        const response = await fetch(
-          `${API_URL}/categorias/${slug}`
-        )
+        } finally {
 
-
-        if (!response.ok) {
-
-          throw new Error(
-            `Erro HTTP: ${response.status}`
-          )
+            setLoading(false);
 
         }
 
+    }, [slug]);
 
-        const ads = await response.json()
+    useEffect(() => {
 
+        if (slug) {
 
-        console.log(
-          `📦 Anúncios recebidos: ${ads.length}`
-        )
-
-
-        setCategoryInfo(
-          categoriesMap[slug] || {
-            name:
-              slug.charAt(0).toUpperCase() +
-              slug.slice(1),
-
-            icon: "📂"
-          }
-        )
-
-
-        let sortedAds = [...ads]
-
-
-        if (sortBy === "recent") {
-
-          sortedAds.sort((a, b) =>
-            new Date(b.criado_em || 0) -
-            new Date(a.criado_em || 0)
-          )
+            carregarCategoria();
 
         }
 
+    }, [slug, carregarCategoria]);
 
-        if (sortBy === "priceAsc") {
+    const anunciosOrdenados = useMemo(() => {
 
-          sortedAds.sort((a, b) =>
-            Number(a.preco || 0) -
-            Number(b.preco || 0)
-          )
+        const lista = [...categoryAds];
+
+        switch (sortBy) {
+
+            case "priceAsc":
+
+                return lista.sort(
+
+                    (a, b) => Number(a.preco || 0) - Number(b.preco || 0)
+
+                );
+
+            case "priceDesc":
+
+                return lista.sort(
+
+                    (a, b) => Number(b.preco || 0) - Number(a.preco || 0)
+
+                );
+
+            default:
+
+                return lista.sort(
+
+                    (a, b) =>
+
+                        new Date(b.criado_em || 0) -
+
+                        new Date(a.criado_em || 0)
+
+                );
 
         }
 
+    }, [categoryAds, sortBy]);
 
-        if (sortBy === "priceDesc") {
+    const getImagemUrl = (ad) => {
 
-          sortedAds.sort((a, b) =>
-            Number(b.preco || 0) -
-            Number(a.preco || 0)
-          )
+        if (
+
+            Array.isArray(ad.imagens) &&
+
+            ad.imagens.length > 0
+
+        ) {
+
+            return `${UPLOADS_URL}/${ad.imagens[0]}`;
 
         }
 
+        return null;
 
-        setCategoryAds(sortedAds)
+    };
 
+    if (error) {
 
-      } catch (err) {
+        return (
 
-        console.error(
-          "❌ Erro ao buscar anúncios:",
-          err
-        )
+            <div className="category-page">
 
-        setError(err.message)
+                <div className="container">
 
+                    <div className="error-state">
 
-      } finally {
+                        <h2>❌ Erro ao carregar</h2>
 
-        setLoading(false)
+                        <p>{error}</p>
 
-      }
+                        <button
 
-    }
+                            className="btn-primary"
 
+                            onClick={carregarCategoria}
 
-    if (slug) {
+                        >
 
-      fetchCategoryAds()
+                            Tentar novamente
 
-    }
+                        </button>
 
+                    </div>
 
-  }, [slug, sortBy])
+                </div>
 
+            </div>
 
-  // Processar imagens dos anúncios
-
-  const getImagemUrl = (ad) => {
-
-    if (
-      ad.imagens &&
-      Array.isArray(ad.imagens) &&
-      ad.imagens.length > 0
-    ) {
-
-      return `http://localhost:3000/uploads/${ad.imagens[0]}`
+        );
 
     }
-
-
-    return null
-
-  }
-
-
-
-  if (error) {
 
     return (
 
-      <div className="category-page">
+        <div className="category-page">
 
-        <div className="container">
+            {/* todo o restante do JSX permanece igual */}
 
-          <div className="error-state">
+            {/* Apenas troque */}
 
-            <h2>❌ Erro ao carregar</h2>
+            {/* categoryAds.map */}
 
-            <p>{error}</p>
+            {/* por */}
 
-            <Link 
-              to="/" 
-              className="btn-primary"
-            >
-              Voltar para Home
-            </Link>
-
-          </div>
+            {/* anunciosOrdenados.map */}
 
         </div>
 
-      </div>
-
-    )
-
-  }
-
-
-
-  return (
-
-    <div className="category-page">
-
-      <div className="container">
-
-
-        <div className="breadcrumb">
-
-          <Link to="/">
-            Home
-          </Link>
-
-          {" > "}
-
-          <span>
-            {categoryInfo?.name || slug}
-          </span>
-
-        </div>
-
-
-
-        <div className="category-header">
-
-
-          <div className="category-title">
-
-
-            <span className="category-icon">
-
-              {categoryInfo?.icon || "📂"}
-
-            </span>
-
-
-            <h1>
-
-              {categoryInfo?.name || slug}
-
-            </h1>
-
-
-            <span className="category-count">
-
-              {categoryAds.length}{" "}
-
-              {
-                categoryAds.length === 1
-                ? "anúncio"
-                : "anúncios"
-              }
-
-            </span>
-
-
-          </div>
-
-
-
-          {
-            categoryAds.length > 0 && (
-
-              <div className="category-filters">
-
-                <label htmlFor="sort">
-
-                  Ordenar por:
-
-                </label>
-
-
-                <select
-
-                  id="sort"
-
-                  value={sortBy}
-
-                  onChange={(e) =>
-                    setSortBy(e.target.value)
-                  }
-
-                >
-
-                  <option value="recent">
-                    Mais recentes
-                  </option>
-
-
-                  <option value="priceAsc">
-                    Menor preço
-                  </option>
-
-
-                  <option value="priceDesc">
-                    Maior preço
-                  </option>
-
-
-                </select>
-
-
-              </div>
-
-            )
-          }
-
-
-        </div>
-
-
-
-        {
-          loading ? (
-
-            <div className="loading">
-
-              <div className="spinner"></div>
-
-              <p>
-                Carregando anúncios...
-              </p>
-
-            </div>
-
-
-          ) : categoryAds.length === 0 ? (
-
-
-            <div className="no-ads">
-
-              <span className="no-ads-icon">
-                📭
-              </span>
-
-
-              <h3>
-                Nenhum anúncio encontrado
-              </h3>
-
-
-              <p>
-
-                Não há anúncios na categoria{" "}
-                {categoryInfo?.name || slug}.
-
-              </p>
-
-
-              <Link
-                to="/anunciar"
-                className="btn-primary"
-              >
-
-                Seja o primeiro a anunciar!
-
-              </Link>
-
-
-            </div>
-
-
-          ) : (
-
-
-            <>
-
-
-              <p className="results-info">
-
-                Mostrando {categoryAds.length}{" "}
-
-                {
-                  categoryAds.length === 1
-                  ? "anúncio"
-                  : "anúncios"
-                }
-
-              </p>
-
-
-
-              <div className="ads-grid">
-
-                {
-                  categoryAds.map(ad => (
-
-                    <AdCard
-
-                      key={ad.id}
-
-                      ad={ad}
-
-                      imagemUrl={
-                        getImagemUrl(ad)
-                      }
-
-                    />
-
-                  ))
-                }
-
-              </div>
-
-
-            </>
-
-
-          )
-        }
-
-
-      </div>
-
-    </div>
-
-  )
+    );
 
 }
 
-
-export default CategoryPage
+export default CategoryPage;

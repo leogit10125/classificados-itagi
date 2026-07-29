@@ -1,5 +1,5 @@
 import React from "react";
-import "./AdCard.css";
+
 
 function AdCard({ ad }) {
   if (!ad) return null;

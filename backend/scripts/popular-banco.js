@@ -1,6 +1,6 @@
 // Importa a conexão do banco (AJUSTE O CAMINHO!)
 const db = require('../config/db'); // 👈 MUDA SE PRECISAR!
-
+const bcrypt = require('bcryptjs');
 async function popularBanco() {
   try {
     console.log('🌱 Populando banco de dados...');
@@ -10,13 +10,20 @@ async function popularBanco() {
     
     // Inserir usuários
     console.log('👤 Inserindo usuários...');
-    await db.query(`
-      INSERT INTO usuarios (nome, email, telefone) VALUES 
-      ('Admin', 'admin@email.com', '11999999999'),
-      ('João Silva', 'joao@email.com', '11988888888'),
-      ('Maria Santos', 'maria@email.com', '11977777777'),
-      ('Pedro Oliveira', 'pedro@email.com', '11966666666')
-    `);
+    const senha = await bcrypt.hash('123456', 10);
+
+      await db.query(`
+        INSERT INTO usuarios (nome, email, telefone, senha) VALUES
+        (?, ?, ?, ?),
+        (?, ?, ?, ?),
+        (?, ?, ?, ?),
+        (?, ?, ?, ?)
+      `, [
+        'Admin', 'admin@email.com', '11999999999', senha,
+        'João Silva', 'joao@email.com', '11988888888', senha,
+        'Maria Santos', 'maria@email.com', '11977777777', senha,
+        'Pedro Oliveira', 'pedro@email.com', '11966666666', senha
+      ]);
 
     // Inserir anúncios
     console.log('📦 Inserindo anúncios...');

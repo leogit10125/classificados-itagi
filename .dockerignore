@@ -1,4 +1,6 @@
 node_modules
-backend
+dist
+.vite
 .git
-docker-compose.yml
+.gitignore
+npm-debug.log

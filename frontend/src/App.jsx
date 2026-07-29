@@ -9,9 +9,11 @@ import CategoryPage from "./pages/CategoryPage";
 import AdDetail from "./pages/AdDetail";
 import Anunciar from "./pages/Anunciar";
 import SearchResults from './pages/SearchResults/SearchResults';
-import EditarAnuncio from './pages/EditarAnuncio';
+import EditarAnuncio from "./pages/EditarAnuncio/EditarAnuncio";
 import MeusAnuncios from "./pages/MeusAnuncios/MeusAnuncios";
+import CategoriesPage from "./pages/Categories";
 // Auth
+import Perfil from "./pages/Perfil";
 import Login from "./pages/Auth/Login"
 import Registro from "./pages/Auth/Registro"
 import RecuperarSenha from "./pages/RecuperarSenha"
@@ -22,6 +24,7 @@ import Sobre from "./pages/institucional/Sobre"
 import Politicas from "./pages/institucional/Politicas"
 import Termos from "./pages/institucional/Termos"
 import Contato from "./pages/institucional/Contato"
+import Destaques from "./pages/Destaques";
 
 // Blog
 import Blog from "./pages/Blog/Blog"
@@ -41,11 +44,14 @@ function App() {
         <Route path="/buscar" element={<SearchResults />} />
         <Route path="/editar-anuncio/:id" element={<EditarAnuncio />} />
         <Route path="/meus-anuncios" element={<MeusAnuncios />} />
-
+        <Route path="/destaques" element={<Destaques />} />
+        <Route path="/categorias" element={<CategoriesPage />} />
+    
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+        <Route path="/perfil" element={<Perfil />} />
 
         <Route path="/sobre" element={<Sobre />} />
         <Route path="/politicas" element={<Politicas />} />

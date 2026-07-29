@@ -1,102 +1,155 @@
-// src/pages/Home/Home.jsx
-// src/pages/Home/Home.jsx
-import React, { useEffect, useState } from 'react';
-import HeroSlider from '../../components/home/HeroSlider/HeroSlider';
-import Categories from '../../components/home/Categories/Categories';
-import AdsCarousel from '../../components/ads/AdsCarousel/AdsCarousel';
-import './Home.css';
+import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import FeaturedAdsV2 from "../../components/ads/FeaturedAdsV2";
 
-const API_URL = 'http://localhost:3000/api';
+//import HeroSlider from "../../components/home/HeroSlider/HeroSlider";
+import HeroPremium from "../../components/home/HeroPremium/HeroPremium";
+import Categories from "../../components/home/Categories/Categories";
+//import AdsCarousel from "../../components/ads/AdsCarousel/AdsCarousel";
+
+import { AdsAPI } from "../../api";
+
+import "./Home.css";
 
 function Home() {
-  const [anuncios, setAnuncios] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchAds();
-  }, []);
+    const navigate = useNavigate();
 
-  const fetchAds = async () => {
-    try {
-      setLoading(true);
-      console.log('🔍 Buscando anúncios...');
-      
-      const response = await fetch(`${API_URL}/ads`);
-      
-      if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`);
-      }
+    const [anuncios, setAnuncios] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-      const data = await response.json();
-      console.log('📦 Anúncios recebidos:', data);
-      
-      setAnuncios(data);
-      setError(null);
-    } catch (error) {
-      console.error('❌ Erro:', error.message);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchAds = useCallback(async () => {
 
-  // Pegar apenas os 6 primeiros para o carrossel
-  const anunciosDestaque = anuncios.slice(0, 6);
+        try {
 
-  console.log('🖥️ Renderizando Home');
+            setLoading(true);
 
-  return (
-    <div className="home-page">
-      {/* HERO SECTION */}
-      <HeroSlider />
-      
-      {/* CATEGORIAS */}
-      <Categories />
-      
-      {/* CARROSSEL DE ANÚNCIOS */}
-      <section className="featured-ads-section">
-        <div className="featured-container">
-          <h2 className="featured-title">📢 Anúncios Recentes</h2>
-          
-          {loading && (
-            <div className="loading-state">
-              <div className="spinner"></div>
-              <p>Carregando anúncios...</p>
-            </div>
-          )}
-          
-          {error && (
-            <div className="error-state">
-              <p>❌ Erro de Conexão</p>
-              <p>O backend está rodando? Verifique o terminal.</p>
-              <button onClick={fetchAds} className="retry-button">
-                🔄 Tentar novamente
-              </button>
-            </div>
-          )}
-          
-          {!loading && !error && (
-            <>
-              {anuncios.length === 0 ? (
-                <div className="empty-state">
-                  <p>📭 Nenhum anúncio cadastrado ainda.</p>
-                  <button className="create-ad-btn" onClick={() => window.location.href = '/anunciar'}>
-                    Seja o primeiro a anunciar!
-                  </button>
+            const data = await AdsAPI.listar();
+
+            setAnuncios(Array.isArray(data) ? data : []);
+
+            setError(null);
+
+        } catch (err) {
+
+            console.error("Erro ao carregar anúncios:", err);
+
+            setError(err.message || "Erro ao carregar anúncios.");
+
+        } finally {
+
+            setLoading(false);
+
+        }
+
+    }, []);
+
+    useEffect(() => {
+
+        fetchAds();
+
+    }, [fetchAds]);
+
+    const anunciosDestaque = anuncios.slice(0, 6);
+
+    return (
+
+        <div className="home-page">
+
+            
+            <HeroPremium />
+
+            <Categories />
+
+            <section className="featured-ads-section">
+
+                <div className="featured-container">
+
+                    
+
+                    {loading && (
+
+                        <div className="loading-state">
+
+                            <div className="spinner"></div>
+
+                            <p>Carregando anúncios...</p>
+
+                        </div>
+
+                    )}
+
+                    {!loading && error && (
+
+                        <div className="error-state">
+
+                            <h3>Erro ao carregar anúncios</h3>
+
+                            <p>{error}</p>
+
+                            <button
+                                className="retry-button"
+                                onClick={fetchAds}
+                            >
+
+                                🔄 Tentar novamente
+
+                            </button>
+
+                        </div>
+
+                    )}
+
+                    {!loading && !error && anuncios.length === 0 && (
+
+                        <div className="empty-state">
+
+                            <p>
+
+                                📭 Ainda não existem anúncios publicados.
+
+                            </p>
+
+                            <button
+                                className="create-ad-btn"
+                                onClick={() => navigate("/anunciar")}
+                            >
+
+                                ➕ Publicar primeiro anúncio
+
+                            </button>
+
+                        </div>
+
+                    )}
+
+                    {!loading && !error && anuncios.length > 0 && (
+
+                        <>
+
+                          
+
+                            <>
+                               
+
+                                <FeaturedAdsV2
+                                    anuncios={anuncios}
+                                />
+                            </> 
+
+                        </>
+
+                    )}
+
                 </div>
-              ) : (
-                <>
-                  <AdsCarousel ads={anunciosDestaque} />
-                  <p className="ads-count">📊 {anuncios.length} anúncios encontrados</p>
-                </>
-              )}
-            </>
-          )}
+
+            </section>
+
         </div>
-      </section>
-    </div>
-  );
+
+    );
+
 }
 
 export default Home;

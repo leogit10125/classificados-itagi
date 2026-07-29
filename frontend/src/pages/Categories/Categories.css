@@ -1,0 +1,101 @@
+.categories-page{
+
+    max-width:1300px;
+
+    margin:auto;
+
+    padding:40px 20px 80px;
+
+}
+
+.categories-hero{
+
+    text-align:center;
+
+    margin-bottom:60px;
+
+}
+
+.categories-hero h1{
+
+    font-size:3rem;
+
+    color:#1e293b;
+
+    margin-bottom:15px;
+
+}
+
+.categories-hero p{
+
+    color:#64748b;
+
+    font-size:1.1rem;
+
+}
+
+.categories-grid{
+
+    margin-bottom:80px;
+
+}
+
+.featured-section{
+
+    margin:80px 0;
+
+}
+
+.featured-section h2{
+
+    margin-bottom:30px;
+
+}
+
+.stats-section{
+
+    margin:80px 0;
+
+}
+
+.cta-section{
+
+    text-align:center;
+
+    padding:60px;
+
+    border-radius:20px;
+
+    background:#f8fafc;
+
+}
+
+.cta-button{
+
+    display:inline-block;
+
+    margin-top:25px;
+
+    padding:16px 36px;
+
+    background:#ff6b00;
+
+    color:white;
+
+    border-radius:12px;
+
+    text-decoration:none;
+
+    font-weight:700;
+
+    transition:.3s;
+
+}
+
+.cta-button:hover{
+
+    background:#ea580c;
+
+    transform:translateY(-3px);
+
+}

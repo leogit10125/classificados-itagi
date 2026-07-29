@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import fotoCidade from "/public/images/cidade-fundo.jpg"
 import "./Menu.css"
 
 function Menu() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isOpen, setIsOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
-  const [activeDropdown, setActiveDropdown] = useState(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 900)
   const navigate = useNavigate()
 
-  // Verificar se usuário está logado
+  // Preservando a sua lógica de autenticação exata
   const isLoggedIn = !!localStorage.getItem('token')
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "{}")
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -23,8 +22,8 @@ function Menu() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768)
-      if (window.innerWidth > 768) {
+      setIsMobile(window.innerWidth <= 900)
+      if (window.innerWidth > 900) {
         setIsOpen(false)
       }
     }
@@ -33,20 +32,12 @@ function Menu() {
   }, [])
 
   const toggleMenu = () => setIsOpen(!isOpen)
-  
-  const closeMenu = () => {
-    setIsOpen(false)
-    setActiveDropdown(null)
-  }
-
-  const toggleDropdown = (index) => {
-    setActiveDropdown(activeDropdown === index ? null : index)
-  }
+  const closeMenu = () => setIsOpen(false)
 
   const handleLogout = () => {
     localStorage.removeItem('token')
-    localStorage.removeItem('user')    // Limpa se existir 'user'
-    localStorage.removeItem('usuario') // Limpa o 'usuario' que usamos no MeusAnuncios
+    localStorage.removeItem('user')    
+    localStorage.removeItem('usuario') 
     navigate('/')
     closeMenu()
   }
@@ -54,80 +45,153 @@ function Menu() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        {/* LOGO */}
+        
+        {/* LOGO (Fundo azul escuro pede texto branco) */}
         <Link to="/" className="logo" onClick={closeMenu}>
-          <div className="logo-icon"></div>
-          <div className="logo-text">
-            <strong>ITAGI</strong>
-            <span>Classificados</span>
+          <div className="logo-wrapper">
+            <span className="logo-icon-img">🤝</span>
+            <div className="logo-text">
+              <strong>ITAGI</strong>
+              <span>Classificados</span>
+            </div>
           </div>
         </Link>
 
-        {/* BUSCA DESKTOP */}
+        {/* ==========================================
+           DESKTOP NAVBAR
+           ========================================== */}
         {!isMobile && (
-          <form className="search-box" onSubmit={handleSearch}>
-            <input
-              type="text"
-              placeholder="O que você procura?"
-              value={searchTerm}
-              onChange={(e)=>setSearchTerm(e.target.value)}
-            />
-            <button type="submit">🔍</button>
-          </form>
-        )}
+          <div className="nav-content-right">
+            <div className="desktop-menu">
+              <Link to="/" className="active-link">Home</Link>
+              <Link to="/categorias">Categorias ▾</Link>
+              {isLoggedIn && <Link to="/meus-anuncios">Meus Anúncios</Link>}
+              <Link to="/sobre">Sobre ▾</Link>
+              <Link to="/contato">Contato</Link>
+            </div>
 
-        {/* MENU */}
-        {!isMobile && (
-          <div className="desktop-menu">
-            <Link to="/">Início</Link>
-            <Link to="/categoria/vendas">Categorias</Link>
-            {isLoggedIn && (
-              <Link to="/meus-anuncios">
-                Meus anúncios
+            {/* BUSCA DESKTOP COMPACTA */}
+            <form className="search-box-compact" onSubmit={handleSearch}>
+              <span className="search-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="Buscar anúncios..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </form>
+
+            <div className="action-buttons">
+              <Link className="btn-anunciar-yellow" to="/anunciar">
+                <span className="icon-plus">+</span> Anunciar
               </Link>
-            )}
-            {isLoggedIn ? (
-              <button className="logout" onClick={handleLogout}>
-                Sair
-              </button>
-            ) : (
-              <Link to="/login">
-                Entrar
-              </Link>
-            )}
-            <Link className="anunciar" to="/anunciar">
-              + Anunciar
-            </Link>
+
+              {isLoggedIn ? (
+                <button className="btn-entrar-nav" onClick={handleLogout}>
+                  🚪 Sair
+                </button>
+              ) : (
+                <Link className="btn-entrar-nav" to="/login">
+                  👤 Entrar
+                </Link>
+              )}
+            </div>
           </div>
         )}
 
-        {/* MOBILE */}
+        {/* ==========================================
+           CONTROLES DO TOPO MOBILE
+           ========================================== */}
         {isMobile && (
-          <>
+          <div className="mobile-controls">
+            <button className="mobile-search-trigger" onClick={toggleMenu}>🔍</button>
+            <Link className="btn-anunciar-yellow mobile-compact-btn" to="/anunciar">
+              + Anunciar
+            </Link>
             <button className="hamburger" onClick={toggleMenu}>
-              ☰
+              {isOpen ? "✕" : "☰"}
             </button>
+          </div>
+        )}
 
-            {isOpen && (
-              <div className="mobile-menu" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>
-                <form className="mobile-search" onSubmit={handleSearch}>
-                  <input
-                    placeholder="Buscar..."
-                    value={searchTerm}
-                    onChange={(e)=>setSearchTerm(e.target.value)}
-                  />
-                </form>
+        {/* ==========================================
+           MENU LATERAL MOBILE (Com o design do mockup)
+           ========================================== */}
+        {isMobile && isOpen && (
+          <>
+            <div className="mobile-menu-overlay" onClick={closeMenu} />
+            <div className="mobile-menu animate-slide-in">
+              
+              {/* Se logado, mostra o Card do Usuário no topo do Menu Lateral */}
+              {isLoggedIn && (
+                <div className="mobile-user-card">
+                  <div className="mobile-avatar">
+                    {usuario.nome ? usuario.nome.charAt(0).toUpperCase() : "U"}
+                  </div>
+                  <div className="mobile-user-info">
+                    <strong>{usuario.nome || "Usuário"}</strong>
+                    <span>{usuario.email || "Bem-vindo"}</span>
+                    <small>Online</small>
+                  </div>
+                </div>
+              )}
+
+              {/* Barra de Busca dentro do Menu */}
+              <form className="mobile-search" onSubmit={handleSearch}>
+                <input
+                  placeholder="O que você procura?..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </form>
+
+              {/* LINKS CONDICIONAIS MOBILE */}
+              <div className="mobile-links-list">
                 <Link to="/" onClick={closeMenu}>🏠 Início</Link>
-                <Link to="/categoria/vendas" onClick={closeMenu}>📂 Categorias</Link>
-                {isLoggedIn && (
-                  <Link to="/meus-anuncios" onClick={closeMenu}>📱 Meus anúncios</Link>
+
+                {isLoggedIn ? (
+                  /* LINKS USUÁRIO LOGADO */
+                  <>
+                    <Link to="/perfil" onClick={closeMenu}>👤 Meu Painel</Link>
+                    <Link to="/meus-anuncios" onClick={closeMenu}>📱 Meus anúncios</Link>
+                    <Link to="/destaques" onClick={closeMenu}>⭐ Destaques</Link>
+                    <Link to="/favoritos" onClick={closeMenu}>❤️ Favoritos</Link>
+                    <Link to="/creditos" onClick={closeMenu}>💳 Créditos</Link>
+                    
+                    <Link className="mobile-anunciar-btn" to="/anunciar" onClick={closeMenu}>
+                      ➕ Novo anúncio
+                    </Link>
+                    
+                    <button className="mobile-logout-btn" onClick={handleLogout}>
+                      🚪 Sair da Conta
+                    </button>
+                  </>
+                ) : (
+                  /* LINKS USUÁRIO DESLOGADO */
+                  <>
+                    <Link to="/categorias" onClick={closeMenu}>📂 Categorias</Link>
+                    <Link to="/destaques" onClick={closeMenu}>🔥 Destaques</Link>
+                    <Link to="/blog" onClick={closeMenu}>📰 Blog</Link>
+                    <Link to="/como-anunciar" onClick={closeMenu}>❓ Como anunciar</Link>
+                    <Link to="/sobre" onClick={closeMenu}>🏢 Quem Somos</Link>
+                    <Link to="/contato" onClick={closeMenu}>☎️ Contato</Link>
+                    
+                    <hr className="menu-divider" />
+                    
+                    <Link to="/login" className="mobile-login-link" onClick={closeMenu}>🔑 Entrar</Link>
+                    <Link to="/registro" className="mobile-register-link" onClick={closeMenu}>📝 Criar Conta</Link>
+                    
+                    <Link className="mobile-anunciar-btn" to="/anunciar" onClick={closeMenu}>
+                      ➕ Novo anúncio
+                    </Link>
+                  </>
                 )}
-                <Link to="/contato" onClick={closeMenu}>☎ Contato</Link>
-                <Link className="mobile-anunciar" to="/anunciar" onClick={closeMenu}>➕ Anunciar</Link>
               </div>
-            )}
+
+            </div>
           </>
         )}
+
       </div>
     </nav>
   )

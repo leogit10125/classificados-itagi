@@ -1,37 +1,50 @@
-// frontend/src/api/ads.js
-
-import request from "./client";
+import { api } from "./client";
 
 export const AdsAPI = {
 
     listar() {
-
-        return request("/ads");
-
+        return api("/ads");
     },
 
     buscar(id) {
+        return api(`/ads/${id}`);
+    },
 
-        return request(`/ads/${id}`);
-
+    destaques() {
+        return api("/ads/destaques");
     },
 
     meus() {
-
-        return request("/ads/meus-anuncios");
-
+        return api("/ads/meus-anuncios");
     },
 
-    criar(dados) {
+    excluir(id) {
+        return api(`/ads/${id}`, {
+            method: "DELETE"
+        });
+    },
 
-        return request("/ads", {
+    atualizar(id, formData) {
+        return api(`/ads/${id}`, {
+            method: "PUT",
+            body: formData
+        });
+    },
 
+    criar(formData) {
+        return api("/ads", {
             method: "POST",
+            body: formData
+        });
+    },
 
-            body: JSON.stringify(dados)
+
+    destacar(id) {
+
+        return api(`/ads/${id}/destaque`, {
+
+            method: "POST"
 
         });
-
-    }
-
-};
+    },
+}

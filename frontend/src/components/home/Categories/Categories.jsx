@@ -1,70 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { getCategorias } from "../../../services/categoriaService"; //  Novo (com 3 subidas de nível)
-import './Categories.css';
+import { useEffect, useState } from "react";
+
+import { CategoriasAPI } from "../../../api";
+
+import { CategoryCarousel } from "./components";
+
+import "./Categories.css";
 
 function Categories() {
-  const [categorias, setCategorias] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    console.log('🔄 Categories montado, carregando dados...');
-    carregarCategorias();
-  }, []);
+    const [categorias, setCategorias] = useState([]);
 
-  const carregarCategorias = async () => {
-    console.log('📥 Chamando getCategorias()...');
-    setLoading(true);
-    const dados = await getCategorias();
-    console.log('📦 Dados recebidos em Categories:', dados);
-    setCategorias(dados);
-    setLoading(false);
-  };
+    useEffect(() => {
 
-  // Ícones para cada categoria (opcional)
-  const getIcon = (categoria) => {
-    const icons = {
-      'Vendas': '🛒',
-      'Serviços': '🔧',
-      'Imóveis': '🏠',
-      'Empregos': '💼',
-      'Veículos': '🚗',
-      'Eletrônicos': '📱',
-      'Eletrodomésticos': '🧊',
-      'Informática': '💻',
-      'Moda': '👕',
-      'Esportes': '⚽',
-      'Outros': '📦'
-    };
-    return icons[categoria.nome] || '📌';
-  };
+        async function carregar() {
 
-  console.log('🔄 Renderizando Categories, loading:', loading, 'categorias:', categorias);
+            try {
 
-  if (loading) {
-    return <div className="categories-loading">Carregando categorias...</div>;
-  }
+                const data = await CategoriasAPI.listar();
 
-  return (
-    <section className="categories-section">
-      <h2 className="categories-title">EXPLORE POR CATEGORIA</h2>
-      <div className="categories-grid">
-        {categorias.map((categoria) => (
-          <Link 
-            key={categoria.slug} 
-            to={`/categoria/${categoria.slug}`}
-            className="category-card"
-          >
-            <span className="category-icon">{getIcon(categoria)}</span>
-            <span className="category-name">{categoria.nome}</span>
-            <span className="category-count">
-              {categoria.total} {categoria.total === 1 ? 'anúncio' : 'anúncios'}
-            </span>
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
+                setCategorias(Array.isArray(data) ? data : []);
+
+            } catch (err) {
+
+                console.error(err);
+
+            }
+
+        }
+
+        carregar();
+
+    }, []);
+
+    return (
+
+        <section className="categories">
+
+            <div className="categories-header">
+
+                <span className="section-badge">
+
+                    Categorias
+
+                </span>
+
+               
+
+            </div>
+
+
+            <CategoryCarousel categorias={categorias} />
+
+            
+        </section>
+
+    );
+
 }
 
 export default Categories;

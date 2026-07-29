@@ -1,11 +1,9 @@
-import request from "./client";
+import { api } from "./client";
 
 export const PerfilAPI = {
 
     dados() {
-
-        return request("/perfil");
-
+        return api("/perfil");
     }
 
 };

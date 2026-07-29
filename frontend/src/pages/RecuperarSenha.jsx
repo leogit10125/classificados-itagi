@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PasswordAPI } from "../api";
 
 function RecuperarSenha() {
   const navigate = useNavigate();
@@ -10,36 +11,25 @@ function RecuperarSenha() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setLoading(true);
-    setMessage('');
-    setError('');
+    setMessage("");
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:3000/api/password/recuperar', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      const data = await PasswordAPI.recuperar(email);
 
-      const data = await response.json();
+      setMessage(
+        data.message || "Se o e-mail estiver cadastrado, você receberá as instruções de recuperação."
+      );
 
-      if (response.ok && data.success) {
-        setMessage(data.message);
-        if (data.debugLink) {
-          console.log('🔗 Link de recuperação:', data.debugLink);
-          setMessage(`${data.message} Verifique o console do terminal para o link.`);
-        }
-      } else {
-        setError(data.error || 'Erro ao processar solicitação');
-      }
     } catch (err) {
-      setError('Erro de conexão com o servidor');
+      console.error(err);
+      setError(err.message || "Erro ao processar solicitação.");
     } finally {
       setLoading(false);
-    }
-  };
+  }
+};
 
   return (
     <div style={styles.container}>

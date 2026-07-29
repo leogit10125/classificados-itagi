@@ -635,4 +635,62 @@ router.post(
     }
 
 );
+/* ==========================================================
+   TORNAR ANÚNCIO PREMIUM
+========================================================== */
+
+router.post(
+    "/:id/destaque",
+    authMiddleware,
+    async (req, res) => {
+
+        try {
+
+            const { id } = req.params;
+            const usuarioId = req.usuario.id;
+
+            const [rows] = await db.query(
+                `
+                SELECT *
+                FROM anuncios
+                WHERE id = ?
+                AND usuario_id = ?
+                `,
+                [id, usuarioId]
+            );
+
+            if (!rows.length) {
+
+                return res.status(404).json({
+                    error: "Anúncio não encontrado."
+                });
+
+            }
+
+            await db.query(
+                `
+                UPDATE anuncios
+                SET destaque = 1
+                WHERE id = ?
+                `,
+                [id]
+            );
+
+            res.json({
+                success: true,
+                message: "Anúncio promovido para destaque."
+            });
+
+        } catch (err) {
+
+            console.error(err);
+
+            res.status(500).json({
+                error: "Erro ao promover anúncio."
+            });
+
+        }
+
+    }
+);
 module.exports = router;

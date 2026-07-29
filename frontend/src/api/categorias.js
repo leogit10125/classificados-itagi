@@ -1,11 +1,13 @@
-import request from "./client";
+import { api } from "./client";
 
 export const CategoriasAPI = {
 
     listar() {
+        return api("/categorias");
+    },
 
-        return request("/categorias");
-
+    slug(slug) {
+        return api(`/categorias/${slug}`);
     }
 
 };

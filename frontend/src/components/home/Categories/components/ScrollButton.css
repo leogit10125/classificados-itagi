@@ -1,0 +1,56 @@
+.scroll-button{
+
+    position:absolute;
+
+    top:50%;
+    margin-top: 53px;
+
+    transform:translateY(-50%);
+
+    width:32px;
+
+    margin-left: 32px;
+
+    margin-right: 32px;
+
+    height:32px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:rgba(238, 226, 118, 0.95);
+
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    z-index:50;
+
+    transition:.25s;
+
+}
+
+.scroll-button:hover{
+
+    transform:translateY(-50%) scale(1.08);
+
+}
+
+.scroll-button.left{
+
+    left:-18px;
+
+}
+
+.scroll-button.right{
+
+    right:-18px;
+
+}

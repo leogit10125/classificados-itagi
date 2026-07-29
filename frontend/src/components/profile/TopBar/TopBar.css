@@ -1,0 +1,29 @@
+.profile-topbar{
+
+background:white;
+
+padding:20px 30px;
+
+border-radius:12px;
+
+margin-bottom:25px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+box-shadow:0 4px 15px rgba(0,0,0,.05);
+
+}
+
+.profile-topbar h2{
+
+margin:0;
+
+font-size:24px;
+
+color:#1d3557;
+
+}

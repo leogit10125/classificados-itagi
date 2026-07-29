@@ -1,0 +1,56 @@
+.ad-info{
+
+    padding:18px;
+
+}
+
+.ad-info h3{
+
+    font-size:1rem;
+
+    color:#1f2937;
+
+    margin-bottom:10px;
+
+    line-height:1.4;
+
+    font-weight:700;
+
+}
+
+.categoria{
+
+    display:inline-flex;
+
+    padding:6px 12px;
+
+    border-radius:999px;
+
+    background:#eff6ff;
+
+    color:#2563eb;
+
+    font-size:.78rem;
+
+    font-weight:700;
+
+}
+.ad-info{
+
+    padding:18px;
+
+}
+
+.ad-info h3{
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    line-height:1.4;
+
+    margin:12px 0;
+
+    color:#1f2937;
+
+}
