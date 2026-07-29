@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-import AdCardV2 from "../../AdCardV2";
+import AdCard from "../../AdCard";
 
 import ScrollButton from "./ScrollButton";
 
@@ -50,7 +50,7 @@ function Carousel({ anuncios = [] }) {
 
                 {anuncios.map(anuncio=>(
 
-                    <AdCardV2
+                    <AdCard
 
                         key={anuncio.id}
 

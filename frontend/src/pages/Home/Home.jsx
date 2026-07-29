@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import FeaturedAdsV2 from "../../components/ads/FeaturedAdsV2";
+import FeaturedAds from "../../components/ads/FeaturedAds";
 
 //import HeroSlider from "../../components/home/HeroSlider/HeroSlider";
 import Hero from "../../components/home/Hero/Hero";
@@ -133,7 +133,7 @@ function Home() {
                             <>
                                
 
-                                <FeaturedAdsV2
+                                <FeaturedAds
                                     anuncios={anuncios}
                                 />
                             </> 

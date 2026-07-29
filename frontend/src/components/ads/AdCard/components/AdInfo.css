@@ -1,0 +1,65 @@
+.ad-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.ad-price{
+
+    font-size:1.25rem;
+
+    font-weight:700;
+
+    color:#2563eb;
+
+}
+
+.ad-title{
+
+    text-decoration:none;
+
+    color:#1e293b;
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    line-height:1.4;
+
+    transition:.25s;
+
+}
+
+.ad-title:hover{
+
+    color:#2563eb;
+
+}
+
+.ad-category{
+
+    font-size:.80rem;
+
+    color:#64748b;
+
+}
+
+.ad-location{
+
+    font-size:.85rem;
+
+    color:#475569;
+
+}
+
+.ad-stats{
+
+    font-size:.80rem;
+
+    color:#94a3b8;
+
+}

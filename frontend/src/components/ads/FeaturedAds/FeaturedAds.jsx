@@ -4,9 +4,9 @@ import { AdsAPI } from "../../../api";
 
 import { Carousel } from "./components";
 
-import "./FeaturedAdsV2.css";
+import "./FeaturedAds.css";
 
-function FeaturedAdsV2() {
+function FeaturedAds() {
 
     const [ads, setAds] = useState([]);
 
@@ -80,4 +80,4 @@ function FeaturedAdsV2() {
 
 }
 
-export default FeaturedAdsV2;
+export default FeaturedAds;
