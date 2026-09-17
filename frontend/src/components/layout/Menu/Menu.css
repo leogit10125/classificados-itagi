@@ -1,331 +1,777 @@
+/* =========================================================
+   MENU / NAVBAR - ITAGI CLASSIFICADOS
+   CSS NOVO BASEADO NO Menu.jsx
+   ========================================================= */
+
 * {
   box-sizing: border-box;
 }
 
-/* NAVBAR PRINCIPAL SÓLIDA */
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
 .navbar {
   width: 100%;
   height: 76px;
+
   position: relative;
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  background-color: #051937; /* Tom azul marinho do mockup */
+
+  background: #051937;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
 }
+
+
+/* =========================================================
+   CONTAINER PRINCIPAL
+   ========================================================= */
 
 .navbar-container {
   width: 100%;
   max-width: 1400px;
+  height: 76px;
+
   margin: 0 auto;
   padding: 0 20px;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
-/* LOGO */
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+
 .logo {
+  display: block;
+
+  flex-shrink: 0;
+
   text-decoration: none;
 }
+
 .logo-wrapper {
+  height: 76px;
+
   display: flex;
   align-items: center;
-  gap: 10px;
+
+  gap: 8px;
 }
+
 .logo-icon-img {
-  font-size: 24px;
-  background: #f1f0eb;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(255,204,0,0.3);
+  width: 80px;
+  height: 80px;
+
+  margin-left: -30px;
+  margin-right: -25px;
+
+  display: block;
+
+  object-fit: contain;
+
+  flex-shrink: 0;
 }
+
 .logo-text {
   display: flex;
   flex-direction: column;
+
+  justify-content: center;
+
   line-height: 1;
 }
+
 .logo-text strong {
-  font-size: 24px;
   color: #ffffff;
-  letter-spacing: 1px;
+
+  font-size: 24px;
   font-weight: 800;
+
+  letter-spacing: 1px;
 }
+
 .logo-text span {
-  font-size: 11px;
+  margin-top: 4px;
+
   color: #cbd5e1;
+
+  font-size: 11px;
+  font-weight: 500;
+
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* DESKTOP STYLES */
+
+/* =========================================================
+   ÁREA DIREITA DA NAVBAR
+   ========================================================= */
+
 .nav-content-right {
+  height: 76px;
+
   display: flex;
   align-items: center;
-  gap: 24px;
+
+  justify-content: flex-end;
+
+  gap: 22px;
+
+  flex: 1;
+
+  min-width: 0;
 }
+
+
+/* =========================================================
+   MENU DESKTOP
+   ========================================================= */
+
 .desktop-menu {
+  height: 76px;
+
   display: flex;
   align-items: center;
+
   gap: 20px;
+
+  flex-shrink: 0;
 }
+
 .desktop-menu a {
-  text-decoration: none;
+  height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+
+  position: relative;
+
+  padding: 0;
+
   color: #f1f5f9 !important;
+
   font-size: 14.5px;
   font-weight: 500;
-  transition: color 0.2s;
+
+  white-space: nowrap;
+
+  text-decoration: none;
+
+  transition: color 0.2s ease;
 }
+
 .desktop-menu a:hover {
   color: #ffcc00 !important;
 }
+
+
+/* LINK ATIVO */
+
 .desktop-menu a.active-link {
   color: #ffcc00 !important;
-  border-bottom: 2px solid #ffcc00;
-  padding-bottom: 4px;
 }
 
-/* BUSCA COMPACTA */
+.desktop-menu a.active-link::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  bottom: 2px;
+
+  height: 2px;
+
+  background: #ffcc00;
+
+  border-radius: 2px;
+}
+
+
+/* =========================================================
+   BUSCA
+   ========================================================= */
+
 .search-box-compact {
+  width: 200px;
+  height: 40px;
+
+  flex-shrink: 0;
+
   display: flex;
   align-items: center;
+
+  padding: 0 14px;
+
   background: rgba(255, 255, 255, 0.08);
+
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  padding: 6px 14px;
-  width: 200px;
-  transition: width 0.25s ease;
+
+  border-radius: 22px;
+
+  transition:
+    width 0.25s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
+
 .search-box-compact:focus-within {
-  width: 260px;
+  width: 240px;
+
   border-color: #ffcc00;
+
   background: rgba(255, 255, 255, 0.12);
 }
+
 .search-icon {
+  flex-shrink: 0;
+
   margin-right: 8px;
+
   font-size: 13px;
 }
+
 .search-box-compact input {
-  background: transparent;
+  width: 100%;
+  min-width: 0;
+
+  padding: 0;
+
   border: none;
   outline: none;
+
+  background: transparent;
+
   color: #ffffff;
+
   font-size: 13.5px;
-  width: 100%;
 }
+
 .search-box-compact input::placeholder {
   color: #94a3b8;
 }
 
-/* BOTÕES */
-.action-buttons {
+
+/* =========================================================
+   BOTÕES DE AÇÃO
+   ========================================================= */
+
+.navbar-action-buttons {
+  height: 40px;
+
   display: flex;
   align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+
+  margin: 0;
+  padding: 0;
+}
+
+
+/* =========================================================
+   BOTÃO ANUNCIAR
+   ========================================================= */
+
+.btn-anunciar-yellow {
+  width: 112px;
+  height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  margin: 0;
+
+  background: #ffcc00;
+
+  color: #051937 !important;
+
+  border: none;
+  border-radius: 22px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn-anunciar-yellow:hover {
+  background: #ffd633;
+
+  box-shadow: 0 5px 14px rgba(255, 204, 0, 0.20);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   BOTÃO ENTRAR / SAIR
+   ========================================================= */
+
+.btn-entrar-nav {
+  width: 98px;
+  height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  margin: 0;
+
+  background: transparent;
+
+  border: 1px solid rgba(255, 255, 255, 0.30);
+
+  border-radius: 22px;
+
+  color: #ffffff !important;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  line-height: 1;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn-entrar-nav:hover {
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(255, 255, 255, 0.45);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   MOBILE - CONTROLES
+   ========================================================= */
+
+.mobile-controls {
+  height: 76px;
+
+  display: flex;
+  align-items: center;
+
   gap: 12px;
 }
-.btn-anunciar-yellow {
-  padding: 10px 20px;
-  background-color: #ffcc00;
-  color: #051937 !important;
-  font-weight: 700;
-  font-size: 14px;
-  text-decoration: none;
-  border-radius: 20px;
-  transition: all 0.2s;
-}
-.btn-anunciar-yellow:hover {
-  background-color: #e6b800;
-}
-.btn-entrar-nav {
-  padding: 9px 18px;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff !important;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-entrar-nav:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
 
-/* MOBILE CONTROLS */
-.mobile-controls {
+.mobile-search-trigger {
+  width: 40px;
+  height: 40px;
+
   display: flex;
   align-items: center;
-  gap: 14px;
-}
-.mobile-search-trigger {
-  background: none;
+  justify-content: center;
+
+  padding: 0;
+
+  margin: 0;
+
+  background: transparent;
+
   border: none;
-  color: white;
+
+  color: #ffffff;
+
   font-size: 18px;
-  cursor: pointer;
-}
-.mobile-compact-btn {
-  padding: 6px 14px;
-  font-size: 12px;
-}
-.hamburger {
-  background: none;
-  border: none;
-  color: white !important;
-  font-size: 26px;
+
   cursor: pointer;
 }
 
-/* ==========================================
-   MENU LATERAL MOBILE MODELADO
-   ========================================== */
+.mobile-compact-btn {
+  width: auto;
+  min-width: 90px;
+
+  height: 38px;
+
+  padding: 0 14px;
+
+  font-size: 12px;
+}
+
+.hamburger {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  margin: 0;
+
+  background: transparent;
+
+  border: none;
+
+  color: #ffffff !important;
+
+  font-size: 26px;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   MENU LATERAL MOBILE
+   ========================================================= */
+
 .mobile-menu-overlay {
   position: fixed;
+
   top: 76px;
   left: 0;
+
   width: 100vw;
   height: calc(100vh - 76px);
+
   background: rgba(0, 0, 0, 0.4);
+
   z-index: 998;
 }
 
 .mobile-menu {
   position: fixed;
+
   top: 76px;
   left: 0;
+
   width: 290px;
   height: calc(100vh - 76px);
+
+  padding: 20px;
+
   background: #ffffff;
+
   display: flex;
   flex-direction: column;
-  padding: 20px;
+
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+
   z-index: 999;
+
   overflow-y: auto;
 }
 
-/* Animação suave para abrir */
+
+/* =========================================================
+   ANIMAÇÃO MOBILE
+   ========================================================= */
+
 .animate-slide-in {
-  animation: slideIn 0.25s forwards ease-out;
-}
-@keyframes slideIn {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+  animation: slideIn 0.25s ease-out forwards;
 }
 
-/* CARD DO USUÁRIO LOGADO INTERNO */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+
+/* =========================================================
+   USUÁRIO MOBILE
+   ========================================================= */
+
 .mobile-user-card {
   display: flex;
   align-items: center;
+
   gap: 12px;
+
   padding: 14px;
+
   margin-bottom: 16px;
+
   background: #f8fafc;
-  border-radius: 12px;
+
   border: 1px solid #f1f5f9;
+
+  border-radius: 12px;
 }
+
 .mobile-avatar {
   width: 46px;
   height: 46px;
-  border-radius: 50%;
-  background: #051937;
-  color: white;
+
+  flex-shrink: 0;
+
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
+  background: #051937;
+
+  border-radius: 50%;
+
+  color: #ffffff;
+
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 700;
 }
+
 .mobile-user-info {
   display: flex;
   flex-direction: column;
+
+  min-width: 0;
+
   line-height: 1.3;
 }
+
 .mobile-user-info strong {
-  font-size: 15px;
   color: #0f172a;
-}
-.mobile-user-info span {
-  font-size: 11px;
-  color: #64748b;
-  max-width: 170px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.mobile-user-info small {
-  color: #10b981;
-  font-weight: 600;
-  font-size: 11px;
+
+  font-size: 15px;
 }
 
-/* BUSCA MOBILE */
+.mobile-user-info span {
+  max-width: 170px;
+
+  overflow: hidden;
+
+  color: #64748b;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+.mobile-user-info small {
+  color: #10b981;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   BUSCA MOBILE
+   ========================================================= */
+
 .mobile-search {
   margin-bottom: 16px;
 }
+
 .mobile-search input {
   width: 100%;
+
   padding: 10px 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  outline: none;
-  font-size: 14px;
+
   background: #f8fafc;
-}
-.mobile-search input:focus {
-  border-color: #051937;
-  background: #fff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 8px;
+
+  outline: none;
+
+  font-size: 14px;
 }
 
-/* LISTA DE LINKS MOBILE */
+.mobile-search input:focus {
+  background: #ffffff;
+
+  border-color: #051937;
+}
+
+
+/* =========================================================
+   LINKS MOBILE
+   ========================================================= */
+
 .mobile-links-list {
   display: flex;
   flex-direction: column;
+
   gap: 12px;
 }
+
 .mobile-links-list a {
-  text-decoration: none;
+  display: block;
+
+  padding: 6px 0;
+
   color: #334155 !important;
+
   font-size: 15px;
   font-weight: 500;
-  padding: 6px 0;
-  display: block;
-  transition: color 0.2s;
+
+  text-decoration: none;
+
+  transition: color 0.2s ease;
 }
+
 .mobile-links-list a:hover {
   color: #051937 !important;
 }
 
-/* Divisores e Botões de Rodapé do Menu */
-.menu-divider {
-  border: 0;
-  border-top: 1px solid #e2e8f0;
-  margin: 10px 0;
-}
+
+/* =========================================================
+   BOTÃO NOVO ANÚNCIO MOBILE
+   ========================================================= */
+
 .mobile-anunciar-btn {
+  margin-top: 8px !important;
+
+  padding: 12px !important;
+
   background: #ffcc00;
+
+  border-radius: 8px;
+
   color: #051937 !important;
+
+  font-weight: 700 !important;
+
   text-align: center;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: 700;
-  margin-top: 8px;
 }
-.mobile-logout-btn {
-  background: #fee2e2;
-  color: #ef4444;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 6px;
+
+
+/* =========================================================
+   DIVISOR
+   ========================================================= */
+
+.menu-divider {
   width: 100%;
+
+  margin: 10px 0;
+
+  border: 0;
+
+  border-top: 1px solid #e2e8f0;
+}
+
+
+/* =========================================================
+   LOGOUT MOBILE
+   ========================================================= */
+
+.mobile-logout-btn {
+  width: 100%;
+
+  margin-top: 6px;
+
+  padding: 12px;
+
+  background: #fee2e2;
+
+  border: none;
+
+  border-radius: 8px;
+
+  color: #ef4444;
+
+  font-weight: 600;
+
   text-align: center;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+  .nav-content-right {
+    gap: 14px;
+  }
+
+  .desktop-menu {
+    gap: 14px;
+  }
+
+  .desktop-menu a {
+    font-size: 13.5px;
+  }
+
+  .search-box-compact {
+    width: 170px;
+  }
+
+  .search-box-compact:focus-within {
+    width: 200px;
+  }
+}
+
+
+@media (max-width: 1000px) {
+
+  .logo-text strong {
+    font-size: 21px;
+  }
+
+  .desktop-menu {
+    gap: 10px;
+  }
+
+  .desktop-menu a {
+    font-size: 13px;
+  }
+
+  .search-box-compact {
+    width: 150px;
+  }
+
+  .btn-anunciar-yellow {
+    width: 100px;
+  }
+
+  .btn-entrar-nav {
+    width: 88px;
+  }
 }

@@ -27,7 +27,7 @@ function AdDetail() {
 
                 setLoading(true);
 
-                const data = await AdsAPI.detalhes(id);
+                const data = await AdsAPI.buscar(id);
 
                 if (!ativo) return;
 

@@ -11,20 +11,12 @@ function HeroContent({ ad }) {
 
         <div className="hero-content">
 
-            <span className="hero-badge">
-                ANÚNCIO EM DESTAQUE
-            </span>
-
-            <h1 className="hero-title">
-                {ad.titulo}
-            </h1>
-
 
             <button
                 className="hero-button"
                 onClick={() => navigate(`/anuncio/${ad.id}`)}
             >
-                Ver anúncio →
+                Ver Anuncio →
             </button>
 
         </div>

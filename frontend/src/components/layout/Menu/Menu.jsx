@@ -49,7 +49,11 @@ function Menu() {
         {/* LOGO (Fundo azul escuro pede texto branco) */}
         <Link to="/" className="logo" onClick={closeMenu}>
           <div className="logo-wrapper">
-            <span className="logo-icon-img">🤝</span>
+            <img
+              src="/images/logo-itagi.svg"
+              alt="Itagi Classificados"
+              className="logo-icon-img"
+            />
             <div className="logo-text">
               <strong>ITAGI</strong>
               <span>Classificados</span>
@@ -81,7 +85,7 @@ function Menu() {
               />
             </form>
 
-            <div className="action-buttons">
+            <div className="navbar-action-buttons">
               <Link className="btn-anunciar-yellow" to="/anunciar">
                 <span className="icon-plus">+</span> Anunciar
               </Link>
@@ -99,6 +103,8 @@ function Menu() {
           </div>
         )}
 
+        
+
         {/* ==========================================
            CONTROLES DO TOPO MOBILE
            ========================================== */}
@@ -106,7 +112,7 @@ function Menu() {
           <div className="mobile-controls">
             <button className="mobile-search-trigger" onClick={toggleMenu}>🔍</button>
             <Link className="btn-anunciar-yellow mobile-compact-btn" to="/anunciar">
-              + Anunciar
+              Anunciar
             </Link>
             <button className="hamburger" onClick={toggleMenu}>
               {isOpen ? "✕" : "☰"}

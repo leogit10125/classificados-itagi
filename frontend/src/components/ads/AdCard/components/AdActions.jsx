@@ -9,16 +9,7 @@ function AdActions({ anuncio }) {
 
         <div className="ad-actions">
 
-            <Link
-                to={`/anuncio/${anuncio.id}`}
-                className="view-button"
-            >
-
-                <span>Ver anúncio</span>
-
-                <ArrowRight size={18} />
-
-            </Link>
+            
 
         </div>
 

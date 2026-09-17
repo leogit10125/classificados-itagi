@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
-
 import { AdsAPI } from "../../../api";
-
 import HeroContent from "./components/HeroContent";
 import HeroImageCard from "./components/HeroImageCard";
 import HeroPriceBox from "./components/HeroPriceBox";
-import HeroDots from "./components/HeroDots";
-
 import "./Hero.css";
 
 function HeroPremium() {
@@ -81,29 +77,47 @@ function HeroPremium() {
 
     const ad = ads[current];
 
-    return (
+   return (
 
-        <section className="hero-premium">
+    <section className="hero-premium">
 
-            <div className="hero-premium-content">
+        <div className="hero-premium-content">
+
+            <div className="hero-left">
 
                 <HeroContent ad={ad} />
 
+            </div>
+
+            <div className="hero-center">
+
+                <span className="hero-badge-top">
+
+                    ANÚNCIO EM DESTAQUE
+
+                </span>
+
                 <HeroImageCard ad={ad} />
+
+                <h2 className="hero-image-title">
+
+                    {ad.titulo}
+
+                </h2>
+
+            </div>
+
+            <div className="hero-right">
 
                 <HeroPriceBox ad={ad} />
 
             </div>
 
-            <HeroDots
-                total={ads.length}
-                current={current}
-                onChange={setCurrent}
-            />
+        </div>
 
-        </section>
+    </section>
 
-    );
+);
 
 }
 

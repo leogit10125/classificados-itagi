@@ -1,170 +1,65 @@
 .hero-content{
 
-    position:absolute;
-
-    left:10px;
-
-    top:50%;
-
-    transform:translateY(-50%);
-
-    z-index:30;
-
-    max-width:420px;
-
     display:flex;
 
     flex-direction:column;
 
-    animation:fadeHero .6s ease;
+    align-items:flex-start;
+
+    gap:14px;
 
 }
-
-/* selo */
-
-.hero-badge{
-
-    width:max-content;
-
-    padding:4px 12px;
-
-    border-radius:999px;
-
-    background:rgba(255,193,7,.18);
-
-    color:#ffd54f;
-
-    font-size:.55rem;
-
-    font-weight:700;
-
-    letter-spacing:1px;
-
-    margin-bottom:8px;
-
-    border:1px solid rgba(255,193,7,.35);
-
-}
-
-/* título */
-
-.hero-title{
-
-    color:white;
-
-    font-size:1.5rem;
-
-    font-weight:800;
-
-    line-height:1.1;
-
-    margin-bottom:8px;
-
-}
-
-/* descrição */
 
 .hero-description{
 
     color:#d7e2f0;
 
-    font-size:.92rem;
-
-    line-height:1.4;
-
-    margin-bottom:10px;
-
-    max-width:360px;
+    line-height:1.5;
 
 }
-
-/* localização */
 
 .hero-meta{
 
-    color:#9fb3c8;
+    color:#dbeafe;
 
-    font-size:.82rem;
-
-    margin-bottom:16px;
+    font-size:.85rem;
 
 }
 
-/* botão */
-
 .hero-button{
 
-    width:max-content;
-
-    padding:5px 6px;
+    background:none;
 
     border:none;
 
-    border-radius:8px;
+    color:#facc15;
 
-    background:#00040c;
-
-    color:rgb(252, 207, 5);
+    font-size:.90rem;
 
     font-weight:700;
 
     cursor:pointer;
 
-    transition:.25s;
-
 }
 
 .hero-button:hover{
 
-    transform:translateY(-2px);
-
-    background:#1d4ed8;
+    color:white;
 
 }
-
-/* animação */
-
-@keyframes fadeHero{
-
-    from{
-
-        opacity:0;
-
-        transform:translateY(-40%);
-
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:translateY(-50%);
-
-    }
-
-}
-
-/* Hero fino */
 
 @media(max-width:900px){
 
-   .hero-title{
-    margin-top:8px;
-    font-size:1.0rem;
+.hero-content{
+
+    align-items:center;
+
 }
 
 .hero-description{
-    font-size:.1rem;
-}
 
-.hero-badge{
-    font: size 0.72em;
-}
+    text-align:center;
 
-.hero-button{
-    height:42px;
-    padding:0 20px;
-    
 }
 
 }

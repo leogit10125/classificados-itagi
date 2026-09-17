@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import {
     AdImage,
     AdInfo,
@@ -16,30 +18,35 @@ function AdCard({ anuncio }) {
 
     return (
 
-        <article className="ad-card">
+        <Link
+            to={`/anuncio/${anuncio.id}`}
+            className="ad-card-link"
+        >
+
+            <article className="ad-card">
+
+                <div className="ad-image-area">
+
+                    <AdImage anuncio={anuncio} />
+
+                    <PremiumBadge anuncio={anuncio} />
+
+                    <FavoriteButton />
+
+                </div>
 
 
-            <div className="ad-image-area">
+                <div className="ad-content">
 
-                <AdImage anuncio={anuncio} />
+                    <AdInfo anuncio={anuncio} />
 
-                <PremiumBadge anuncio={anuncio} />
+                    <AdActions anuncio={anuncio} />
 
-                <FavoriteButton />
+                </div>
 
-            </div>
+            </article>
 
-
-            <div className="ad-content">
-
-                <AdInfo anuncio={anuncio} />
-
-                <AdActions anuncio={anuncio} />
-
-            </div>
-
-
-        </article>
+        </Link>
 
     );
 
