@@ -17,6 +17,9 @@ services:
     container_name: itagi-backend
     restart: always
 
+    env_file:
+      - ./backend/.env.cloudinary
+
     ports:
       - "3000:3000"
 

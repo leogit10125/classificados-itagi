@@ -1,4 +1,4 @@
-import { UPLOADS_URL } from "../../../config/api";
+import { getImageUrl } from "../../../utils/imageUrl";
 
 function GalleryManager({ anuncio, onFilesChange }) {
 
@@ -16,7 +16,7 @@ function GalleryManager({ anuncio, onFilesChange }) {
                     <div key={index} className="gallery-item">
 
                         <img
-                            src={`${UPLOADS_URL}/${img}`}
+                            src={getImageUrl(img)}
                             alt={`Imagem ${index + 1}`}
                         />
 

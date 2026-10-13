@@ -2,7 +2,7 @@ import "./AdManagerCard.css";
 
 import StatusBadge from "../StatusBadge";
 import ActionButtons from "../ActionButtons";
-import { UPLOADS_URL } from "../../../config/api";
+import { getImageUrl } from "../../../utils/imageUrl";
 
 
 
@@ -14,7 +14,7 @@ function AdManagerCard({
 }) {
 
     const imagem = anuncio.imagens?.length
-        ? `${UPLOADS_URL}/${anuncio.imagens[0]}`
+        ? getImageUrl(anuncio.imagens[0])
         : "https://via.placeholder.com/220x160?text=Sem+Imagem";
 
     return (

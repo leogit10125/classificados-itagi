@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AdsAPI } from "../../api";
-import { UPLOADS_URL } from "../../config/api";
+import { getImageUrl } from "../../utils/imageUrl";
 
 import "./MeusAnuncios.css";
 
@@ -199,7 +199,7 @@ function MeusAnuncios() {
 
                                             <img
 
-                                                src={`${UPLOADS_URL}/${ad.imagens[0]}`}
+                                                src={getImageUrl(ad.imagens[0])}
 
                                                 alt={ad.titulo}
 

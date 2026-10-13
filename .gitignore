@@ -22,3 +22,4 @@ coverage/
 # Backups locais: não enviar ao GitHub
 /backups/
 backend/middleware/*.backup-deploy
+backend/.env.cloudinary

@@ -1,4 +1,4 @@
-import { UPLOADS_URL } from "../../../../config/api";
+import { getImageUrl } from "../../../../utils/imageUrl";
 import "./AdImage.css";
 
 function AdImage({ anuncio }) {
@@ -11,7 +11,7 @@ function AdImage({ anuncio }) {
             anuncio.imagens.length
         ) {
 
-            return `${UPLOADS_URL}/${anuncio.imagens[0]}`;
+            return getImageUrl(anuncio.imagens[0]);
 
         }
 

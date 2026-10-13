@@ -6,7 +6,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import AdCard from "../../components/ads/AdCard/AdCard";
 
 import { AdsAPI } from "../../api";
-import { UPLOADS_URL } from "../../config/api";
+import { getImageUrl } from "../../utils/imageUrl";
 
 import "./SearchResults.css";
 
@@ -82,7 +82,7 @@ function SearchResults() {
 
         ) {
 
-            return `${UPLOADS_URL}/${ad.imagens[0]}`;
+            return getImageUrl(ad.imagens[0]);
 
         }
 

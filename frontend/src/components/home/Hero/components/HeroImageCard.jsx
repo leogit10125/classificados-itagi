@@ -1,4 +1,4 @@
-import { UPLOADS_URL } from "../../../../config/api";
+import { getImageUrl } from "../../../../utils/imageUrl";
 import "./HeroImageCard.css";
 
 
@@ -9,7 +9,7 @@ function HeroImageCard({ ad }) {
 
     const imagem =
         Array.isArray(ad.imagens) && ad.imagens.length
-            ? `${UPLOADS_URL}/${ad.imagens[0]}`
+            ? getImageUrl(ad.imagens[0])
             : "/images/placeholder.jpg";
 
     return (

@@ -5,6 +5,7 @@ console.log("✅ Router criado");
 
 const db = require("../config/db");
 const upload = require("../middleware/upload");
+const uploadToCloudinary = require("../middleware/uploadToCloudinary");
 const authMiddleware = require("../middleware/auth");
 const checkAdLimit = require("../middleware/checkAdLimit");
 
@@ -413,6 +414,7 @@ router.post(
     authMiddleware,
     checkAdLimit,
     upload.array("imagens", 5),
+    uploadToCloudinary,
 
     async (req, res) => {
 
