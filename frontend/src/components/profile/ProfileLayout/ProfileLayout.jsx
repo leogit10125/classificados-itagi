@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../../../config/api";
 
 import Sidebar from "../Sidebar";
 import TopBar from "../TopBar";
@@ -24,7 +25,7 @@ function ProfileLayout({ children }) {
         try{
 
             const response = await fetch(
-                "http://localhost:3000/api/ads/meus-anuncios",
+                `${API_URL}/ads/meus-anuncios`,
                 {
                     headers:{
                         Authorization:`Bearer ${token}`
@@ -97,7 +98,7 @@ function ProfileLayout({ children }) {
 
             const response =
             await fetch(
-                `http://localhost:3000/api/ads/${id}`,
+                `${API_URL}/ads/${id}`,
                 {
                     method:"DELETE",
                     headers:{

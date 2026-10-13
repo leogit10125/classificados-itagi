@@ -1,6 +1,7 @@
+import { UPLOADS_URL } from "../../../../config/api";
 import "./HeroImageCard.css";
 
-const UPLOADS_URL = "http://localhost:3000/uploads";
+
 
 function HeroImageCard({ ad }) {
 

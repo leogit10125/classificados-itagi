@@ -7,13 +7,13 @@ const dotenv = require('dotenv');
 const path = require('path');
 const bcrypt = require('bcryptjs'); // 💡 Unificado para bcryptjs para evitar quebras em ambientes Docker/Alpine
 
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'seu-segredo-super-secreto-2024';
-
 // =====================================
 // CONFIGURAÇÃO INICIAL
 // =====================================
 dotenv.config();
+
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Debug das configurações no terminal do Docker
 console.log('📦 Configuração carregada:');
@@ -38,13 +38,18 @@ const adRoutes = require('./routes/adRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
 const pacotesRoutes = require('./routes/pacotesRoutes');
-const passwordRoutes = require('./routes/passwordRoutes');
+
 
 // =====================================
 // MIDDLEWARES
 // =====================================
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:3000'
+];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -89,37 +94,43 @@ if (pacotesRoutes && typeof pacotesRoutes === 'function') {
     console.log('✅ Rota /api/pacotes carregada');
 }
 
-if (passwordRoutes && typeof passwordRoutes === 'function') {
-    app.use('/api/password', passwordRoutes);
-    console.log('✅ Rota /api/password carregada');
-}
+
 
 // =====================================
 // ROTA DE REGISTRO (AJUSTADA PARA MYSQL2/PROMISE)
 // =====================================
 app.post('/api/registro', async (req, res) => {
-  const { nome, email, senha, telefone } = req.body;
+  const { nome, email, senha, telefone, whatsapp_publico } = req.body;
   console.log('📝 Tentativa de registro:', email);
-  
+
   try {
     // [existingUser] desestrutura o retorno pegando apenas as linhas (rows)
     const [existingUser] = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
-    
+
     if (existingUser.length > 0) {
       return res.status(400).json({ error: 'Email já cadastrado' });
     }
-    
+
     const hashedPassword = await bcrypt.hash(senha, 10);
-    
+
     // 💡 Regra 3: Desestruturação utilizada no retorno do INSERT
+
     const [result] = await db.query(
-      'INSERT INTO usuarios (nome, email, senha, telefone, anuncios_gratuitos_restantes) VALUES (?, ?, ?, ?, 2)',
-      [nome, email, hashedPassword, telefone || '']
+      `INSERT INTO usuarios
+       (nome, email, senha, telefone, anuncios_gratuitos_restantes, whatsapp_publico)
+       VALUES (?, ?, ?, ?, 2, ?)`,
+      [
+        nome,
+        email,
+        hashedPassword,
+        telefone || '',
+        whatsapp_publico === true ? 1 : 0
+      ]
     );
-    
+
     console.log('✅ Usuário criado com sucesso:', email);
-    res.status(201).json({ 
-      success: true, 
+    res.status(201).json({
+      success: true,
       message: 'Cadastro realizado com sucesso!',
       userId: result.insertId
     });
@@ -135,30 +146,30 @@ app.post('/api/registro', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   const { email, senha } = req.body;
   console.log('📝 Tentativa de login:', email);
-  
+
   try {
     const [users] = await db.query('SELECT id, nome, email, telefone, senha FROM usuarios WHERE email = ?', [email]);
-    
+
     if (users.length === 0) {
       console.log('❌ Usuário não encontrado:', email);
       return res.status(401).json({ error: 'Email ou senha inválidos' });
     }
-    
+
     // 💡 Regra 2: Busca por apenas um registro utilizando índice [0] de forma segura
     const user = users[0];
     const senhaValida = await bcrypt.compare(senha, user.senha);
-    
+
     if (senhaValida) {
       console.log('✅ Login bem sucedido:', email);
-      
+
       const token = jwt.sign(
         { id: user.id, email: user.email, nome: user.nome },
         JWT_SECRET,
         { expiresIn: '7d' }
       );
-      
-      res.json({ 
-        success: true, 
+
+      res.json({
+        success: true,
         message: 'Login realizado com sucesso!',
         user: {
           id: user.id,
@@ -183,48 +194,48 @@ app.post('/api/login', async (req, res) => {
 // =====================================
 app.get('/api/meus-anuncios', async (req, res) => {
   console.log('🔍 Buscando meus anúncios...');
-  
+
   const token = req.headers.authorization?.split(' ')[1];
-  
+
   if (!token) {
     console.log('❌ Token não fornecido');
-    return res.status(401).json({ 
-      success: false, 
+    return res.status(401).json({
+      success: false,
       error: 'Não autorizado',
-      anuncios: [] 
+      anuncios: []
     });
   }
-  
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.id;
-    
+
     console.log(`👤 Buscando anúncios do usuário ID: ${userId}`);
-    
+
     // 💡 Regra 5: Corrigido created_at para criado_em e removido JOIN de categoria_id que causava conflito
     const anunciosQuery = `
-      SELECT a.*, a.categoria as categoria_nome 
+      SELECT a.*, a.categoria as categoria_nome
       FROM anuncios a
       WHERE a.usuario_id = ?
       ORDER BY a.criado_em DESC
     `;
-    
+
     const [anuncios] = await db.query(anunciosQuery, [userId]);
-    
+
     console.log(`✅ Encontrados ${anuncios.length} anúncios`);
-    
+
     res.json({
       success: true,
       anuncios: anuncios || [],
       total: anuncios.length
     });
-    
+
   } catch (error) {
     console.error('❌ Erro ao buscar meus anúncios:', error);
-    res.status(401).json({ 
-      success: false, 
+    res.status(401).json({
+      success: false,
       error: 'Token inválido',
-      anuncios: [] 
+      anuncios: []
     });
   }
 });
@@ -256,9 +267,9 @@ app.get('/api/test', async (req, res) => {
 // =====================================
 app.use((req, res) => {
   console.log(`❌ Rota não encontrada: ${req.method} ${req.url}`);
-  res.status(404).json({ 
+  res.status(404).json({
     error: 'Rota não encontrada',
-    path: req.url 
+    path: req.url
   });
 });
 

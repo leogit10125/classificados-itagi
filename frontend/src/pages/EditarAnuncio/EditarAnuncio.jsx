@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { AdsAPI } from "../../api";
 
@@ -14,10 +14,19 @@ import DangerZone from "./components/DangerZone";
 function EditarAnuncio() {
 
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [anuncio, setAnuncio] = useState(null);
-
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
+    const [form, setForm] = useState({
+        titulo: "",
+        descricao: "",
+        preco: "",
+        categoria: "",
+        localizacao: ""
+    });
 
     useEffect(() => {
 
@@ -28,6 +37,14 @@ function EditarAnuncio() {
                 const data = await AdsAPI.buscar(id);
 
                 setAnuncio(data);
+
+                setForm({
+                    titulo: data.titulo ?? "",
+                    descricao: data.descricao ?? "",
+                    preco: data.preco ?? "",
+                    categoria: data.categoria ?? "",
+                    localizacao: data.localizacao ?? ""
+                });
 
             } catch (err) {
 
@@ -45,33 +62,107 @@ function EditarAnuncio() {
 
     }, [id]);
 
+
+    function handleChange(event) {
+
+        const { name, value } = event.target;
+
+        setForm((dados) => ({
+            ...dados,
+            [name]: value
+        }));
+
+    }
+
+
+    async function handleSubmit(event) {
+
+        event.preventDefault();
+
+        try {
+
+            setSaving(true);
+
+            const resposta = await AdsAPI.atualizar(id, form);
+
+            if (resposta.anuncio) {
+                setAnuncio(resposta.anuncio);
+            }
+
+            alert(
+                resposta.message ||
+                "Anúncio atualizado com sucesso."
+            );
+
+        } catch (err) {
+
+            console.error(err);
+
+            alert(
+                err.message ||
+                "Não foi possível atualizar o anúncio."
+            );
+
+        } finally {
+
+            setSaving(false);
+
+        }
+
+    }
+
+
+    async function handleDelete() {
+
+        const confirmar = window.confirm(
+            "Tem certeza que deseja excluir este anúncio?"
+        );
+
+        if (!confirmar) return;
+
+        try {
+
+            await AdsAPI.excluir(id);
+
+            alert("Anúncio excluído com sucesso.");
+
+            navigate("/meus-anuncios");
+
+        } catch (err) {
+
+            console.error(err);
+
+            alert(
+                err.message ||
+                "Não foi possível excluir o anúncio."
+            );
+
+        }
+
+    }
+
+
     if (loading) {
 
         return (
-
             <div className="edit-loading">
-
                 Carregando anúncio...
-
             </div>
-
         );
 
     }
+
 
     if (!anuncio) {
 
         return (
-
             <div className="edit-loading">
-
                 Anúncio não encontrado.
-
             </div>
-
         );
 
     }
+
 
     return (
 
@@ -81,35 +172,42 @@ function EditarAnuncio() {
 
                 <header className="edit-header">
 
-                    <h1>✏️ Editar anúncio</h1>
+                    <h1>✏ Editar anúncio</h1>
 
                     <p>
-
                         Atualize informações, destaque seu anúncio e gerencie suas imagens.
-
                     </p>
 
                 </header>
 
-                <StatsCard anuncio={anuncio} />
+
+                <StatsCard
+                    anuncio={anuncio}
+                />
+
 
                 <PremiumCard
                     anuncio={anuncio}
                     setAnuncio={setAnuncio}
                 />
 
+
                 <GalleryManager
                     anuncio={anuncio}
-                    setAnuncio={setAnuncio}
                 />
+
 
                 <EditForm
                     anuncio={anuncio}
-                    setAnuncio={setAnuncio}
+                    form={form}
+                    onChange={handleChange}
+                    onSubmit={handleSubmit}
+                    saving={saving}
                 />
 
+
                 <DangerZone
-                    anuncio={anuncio}
+                    onDelete={handleDelete}
                 />
 
             </div>

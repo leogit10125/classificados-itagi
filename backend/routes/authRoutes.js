@@ -59,7 +59,7 @@ router.post('/register', async (req, res) => {
     // 5. Gera token JWT para autenticação
     const token = jwt.sign(
       { id: userId },
-      process.env.JWT_SECRET || 'segredo_temporario_123',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -106,7 +106,7 @@ router.post('/login', async (req, res) => {
     // 4. Gera token JWT
     const token = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET || 'segredo_temporario_123',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -140,7 +140,7 @@ router.get('/verify', async (req, res) => {
     }
 
     // Verifica token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'segredo_temporario_123');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Busca dados atualizados do usuário
     // 💡 Regra 2: Desestruturando rows para pegar um usuário específico
@@ -199,8 +199,10 @@ router.post('/esqueci-senha', async (req, res) => {
       [usuarioId, token, expiraEm]
     );
 
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
     // Link para redefinição (ajuste a porta conforme seu frontend)
-    const resetLink = `http://localhost:5173/resetar-senha/${token}`;
+    const resetLink = `${frontendUrl}/redefinir-senha?token=${token}`;
 
     // Enviar email
     await transporter.sendMail({

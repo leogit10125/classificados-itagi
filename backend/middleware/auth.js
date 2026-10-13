@@ -2,7 +2,10 @@
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'seu-segredo-super-secreto-2024';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET não configurado. Autenticação interrompida por segurança.');
+}
 
 module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization;

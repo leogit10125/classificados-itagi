@@ -3,16 +3,16 @@ import { api } from "./client";
 export const PasswordAPI = {
 
     recuperar(email) {
-        return api("/password/recuperar", {
+        return api("/auth/esqueci-senha", {
             method: "POST",
-            body: { email }
+            body: JSON.stringify({ email })
         });
     },
 
     redefinir(token, senha) {
-        return api("/password/redefinir", {
+        return api(`/auth/resetar-senha/${token}`, {
             method: "POST",
-            body: { token, senha }
+            body: JSON.stringify({ senha })
         });
     }
 

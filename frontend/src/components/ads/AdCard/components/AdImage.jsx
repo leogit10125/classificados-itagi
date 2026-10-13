@@ -1,3 +1,4 @@
+import { UPLOADS_URL } from "../../../../config/api";
 import "./AdImage.css";
 
 function AdImage({ anuncio }) {
@@ -10,7 +11,7 @@ function AdImage({ anuncio }) {
             anuncio.imagens.length
         ) {
 
-            return `http://localhost:3000/uploads/${anuncio.imagens[0]}`;
+            return `${UPLOADS_URL}/${anuncio.imagens[0]}`;
 
         }
 

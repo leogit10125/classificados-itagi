@@ -2,8 +2,9 @@ import "./AdManagerCard.css";
 
 import StatusBadge from "../StatusBadge";
 import ActionButtons from "../ActionButtons";
+import { UPLOADS_URL } from "../../../config/api";
 
-const API = "http://localhost:3000/uploads";
+
 
 function AdManagerCard({
     anuncio,
@@ -13,7 +14,7 @@ function AdManagerCard({
 }) {
 
     const imagem = anuncio.imagens?.length
-        ? `${API}/${anuncio.imagens[0]}`
+        ? `${UPLOADS_URL}/${anuncio.imagens[0]}`
         : "https://via.placeholder.com/220x160?text=Sem+Imagem";
 
     return (

@@ -350,26 +350,20 @@ router.get("/:id", async (req, res) => {
 
         const { id } = req.params;
 
+
         const query = `
-
             SELECT
-
                 a.*,
-
                 u.nome AS usuario_nome,
-
-                u.telefone,
-
-                u.email
-
+                CASE
+                    WHEN u.whatsapp_publico = 1 THEN u.telefone
+                    ELSE NULL
+                END AS telefone,
+                u.whatsapp_publico
             FROM anuncios a
-
             LEFT JOIN usuarios u
-
                 ON u.id = a.usuario_id
-
             WHERE a.id = ?
-
         `;
 
         const [rows] = await db.query(query, [id]);
@@ -687,6 +681,213 @@ router.post(
 
             res.status(500).json({
                 error: "Erro ao promover anúncio."
+            });
+
+        }
+
+    }
+);
+/* ==========================================================
+   EXCLUIR ANÚNCIO
+========================================================== */
+
+router.delete(
+    "/:id",
+    authMiddleware,
+    async (req, res) => {
+
+        try {
+
+            const { id } = req.params;
+            const usuarioId = req.usuario.id;
+
+            // Buscar somente anúncio pertencente ao usuário logado
+            const [rows] = await db.query(
+                `
+                SELECT id, imagens
+                FROM anuncios
+                WHERE id = ?
+                AND usuario_id = ?
+                `,
+                [id, usuarioId]
+            );
+
+            if (!rows.length) {
+
+                return res.status(404).json({
+                    error: "Anúncio não encontrado."
+                });
+
+            }
+
+            const anuncio = rows[0];
+
+            // Processar nomes das imagens
+            const imagens = processarImagens(anuncio.imagens);
+
+            // Remover arquivos físicos
+            for (const imagem of imagens) {
+
+                if (!imagem) continue;
+
+                const caminhoImagem = path.join(
+                    __dirname,
+                    "..",
+                    "uploads",
+                    imagem
+                );
+
+                try {
+
+                    if (fs.existsSync(caminhoImagem)) {
+
+                        fs.unlinkSync(caminhoImagem);
+
+                        console.log(
+                            `🗑️ Imagem removida: ${imagem}`
+                        );
+
+                    }
+
+                } catch (erroImagem) {
+
+                    console.error(
+                        `⚠️ Erro ao remover imagem ${imagem}:`,
+                        erroImagem.message
+                    );
+
+                }
+
+            }
+
+            // Remover anúncio
+            await db.query(
+                `
+                DELETE FROM anuncios
+                WHERE id = ?
+                AND usuario_id = ?
+                `,
+                [id, usuarioId]
+            );
+
+            res.json({
+
+                success: true,
+
+                message: "Anúncio excluído com sucesso."
+
+            });
+
+        } catch (err) {
+
+            console.error(err);
+
+            res.status(500).json({
+
+                error: "Erro ao excluir anúncio."
+
+            });
+
+        }
+
+    }
+);
+/* ==========================================================
+   ATUALIZAR ANÚNCIO
+========================================================== */
+
+router.put(
+    "/:id",
+    authMiddleware,
+    async (req, res) => {
+
+        try {
+
+            const { id } = req.params;
+            const usuarioId = req.usuario.id;
+
+            const {
+                titulo,
+                descricao,
+                preco,
+                categoria,
+                localizacao
+            } = req.body;
+
+            // Verificar se o anúncio pertence ao usuário
+            const [rows] = await db.query(
+                `
+                SELECT id
+                FROM anuncios
+                WHERE id = ?
+                AND usuario_id = ?
+                `,
+                [id, usuarioId]
+            );
+
+            if (!rows.length) {
+
+                return res.status(404).json({
+                    error: "Anúncio não encontrado."
+                });
+
+            }
+
+            // Atualizar somente os dados do anúncio
+            await db.query(
+                `
+                UPDATE anuncios
+                SET
+                    titulo = ?,
+                    descricao = ?,
+                    preco = ?,
+                    categoria = ?,
+                    localizacao = ?
+                WHERE id = ?
+                AND usuario_id = ?
+                `,
+                [
+                    titulo,
+                    descricao,
+                    preco !== undefined && preco !== ""
+                        ? Number(preco)
+                        : null,
+                    categoria,
+                    localizacao,
+                    id,
+                    usuarioId
+                ]
+            );
+
+            // Buscar anúncio atualizado
+            const [atualizados] = await db.query(
+                `
+                SELECT *
+                FROM anuncios
+                WHERE id = ?
+                AND usuario_id = ?
+                `,
+                [id, usuarioId]
+            );
+
+            const anuncio = atualizados[0];
+
+            res.json({
+                success: true,
+                message: "Anúncio atualizado com sucesso.",
+                anuncio: {
+                    ...anuncio,
+                    preco: Number(anuncio.preco),
+                    imagens: processarImagens(anuncio.imagens)
+                }
+            });
+
+        } catch (err) {
+
+            console.error(err);
+
+            res.status(500).json({
+                error: "Erro ao atualizar anúncio."
             });
 
         }

@@ -14,19 +14,21 @@ function Registro() {
         email: "",
         telefone: "",
         senha: "",
-        confirmarSenha: ""
+        confirmarSenha: "",
+        whatsapp_publico: false
+
     });
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     function handleChange(e) {
+        const { name, value, type, checked } = e.target;
 
         setForm({
             ...form,
-            [e.target.name]: e.target.value
+            [name]: type === "checkbox" ? checked : value
         });
-
     }
 
     async function handleSubmit(e) {
@@ -52,8 +54,8 @@ function Registro() {
                 nome: form.nome,
                 email: form.email,
                 telefone: form.telefone,
-                senha: form.senha
-
+                senha: form.senha,
+                whatsapp_publico: form.whatsapp_publico
             });
 
             alert("Cadastro realizado com sucesso!");
@@ -117,6 +119,18 @@ function Registro() {
                         value={form.telefone}
                         onChange={handleChange}
                     />
+                    <label className="whatsapp-consent">
+                        <input
+                            type="checkbox"
+                            name="whatsapp_publico"
+                            checked={form.whatsapp_publico}
+                            onChange={handleChange}
+                        />
+                         <span>
+                             Autorizo exibir meu telefone nos meus anúncios para contato
+                             pelo WhatsApp. Outros usuários poderão ver esse número.
+                        </span>
+                    </label>
 
                     <input
                         name="senha"

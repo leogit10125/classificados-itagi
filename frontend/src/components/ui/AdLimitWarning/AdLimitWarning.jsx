@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_URL } from '../../../config/api';
 import './AdLimitWarning.css';
 
 function AdLimitWarning() {
@@ -14,7 +15,7 @@ function AdLimitWarning() {
 
   const carregarCreditos = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/pacotes/creditos', {
+      const response = await fetch(`${API_URL}/pacotes/creditos`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -26,7 +27,7 @@ function AdLimitWarning() {
 
   const carregarPacotes = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/pacotes');
+      const response = await fetch(`${API_URL}/pacotes`);
       const data = await response.json();
       setPacotes(data);
     } catch (err) {
@@ -36,7 +37,7 @@ function AdLimitWarning() {
 
   const comprarPacote = async (pacote) => {
     try {
-      const response = await fetch('http://localhost:3000/api/pacotes/comprar', {
+      const response = await fetch(`${API_URL}/pacotes/comprar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

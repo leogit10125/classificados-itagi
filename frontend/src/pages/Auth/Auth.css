@@ -142,3 +142,27 @@
   margin-bottom: 20px;
   text-align: center;
 }
+.whatsapp-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 12px 0 18px;
+    color: #444;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+}
+
+.whatsapp-consent input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    margin: 2px 0 0;
+    accent-color: #25D366;
+    cursor: pointer;
+}
+
+.whatsapp-consent span {
+    flex: 1;
+}

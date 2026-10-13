@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { PasswordAPI } from "../api";
 
 function RedefinirSenha() {
   const navigate = useNavigate();
@@ -21,8 +22,8 @@ function RedefinirSenha() {
       return;
     }
     
-    if (novaSenha.length < 4) {
-      setError('A senha deve ter pelo menos 4 caracteres');
+    if (novaSenha.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres');
       return;
     }
     
@@ -31,22 +32,14 @@ function RedefinirSenha() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3000/api/password/redefinir', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, novaSenha }),
-      });
+      const data = await PasswordAPI.redefinir(token, novaSenha);
 
-      const data = await response.json();
+      setMessage(data.message || 'Senha redefinida com sucesso!');
+      setTimeout(() => navigate('/login'), 3000);
 
-      if (response.ok && data.success) {
-        setMessage('Senha redefinida com sucesso!');
-        setTimeout(() => navigate('/login'), 3000);
-      } else {
-        setError(data.error || 'Erro ao redefinir senha');
-      }
     } catch (err) {
-      setError('Erro de conexão com o servidor');
+      console.error(err);
+      setError(err.message || 'Erro ao redefinir senha');
     } finally {
       setLoading(false);
     }

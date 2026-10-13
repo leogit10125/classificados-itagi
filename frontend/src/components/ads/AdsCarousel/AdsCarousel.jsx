@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { UPLOADS_URL } from "../../../config/api";
 import "./AdsCarousel.css";
 
 // Placeholder fora do componente para não recriar a cada render
@@ -51,7 +52,7 @@ function AdsCarousel({ ads = [] }) {
       const foto = ad.imagens[0];
       if (foto && typeof foto === 'string') {
         // Se já for uma URL completa (http...), usa direto, senão monta o link do backend
-        return foto.startsWith('http') ? foto : `http://localhost:3000/uploads/${foto}`;
+        return foto.startsWith('http') ? foto : `${UPLOADS_URL}/${foto}`;
       }
     }
     return PLACEHOLDER_IMG;

@@ -24,12 +24,12 @@ export const AdsAPI = {
         });
     },
 
-    atualizar(id, formData) {
-        return api(`/ads/${id}`, {
-            method: "PUT",
-            body: formData
-        });
-    },
+    atualizar(id, dados) {
+    return api(`/ads/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(dados)
+    });
+},
 
     criar(formData) {
         return api("/ads", {

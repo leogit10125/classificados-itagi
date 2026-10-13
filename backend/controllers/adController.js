@@ -50,7 +50,7 @@ exports.getAllAds = async (req, res) => {
       const imagensArray = imagens.map(img => ({
         id: img.id,
         path: img.imagem_path,
-        url: `http://localhost:3000/uploads/${img.imagem_path}` // Ajustado para porta 3000 do container backend
+        url: `/uploads/${img.imagem_path}` // Ajustado para porta 3000 do container backend
       }));
       
       let jsonImagens = [];
@@ -91,7 +91,7 @@ exports.getAdById = async (req, res) => {
     const imagensArray = imagens.map(img => ({
       id: img.id,
       path: img.imagem_path,
-      url: `http://localhost:3000/uploads/${img.imagem_path}`
+      url: `/uploads/${img.imagem_path}`
     }));
     
     let jsonImagens = [];

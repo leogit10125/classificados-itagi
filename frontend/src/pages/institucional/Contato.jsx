@@ -36,7 +36,7 @@ function Contato() {
                 <span className="info-icon">📧</span>
                 <div>
                   <strong>E-mail:</strong>
-                  <p>contato@itagiclassificados.com.br</p>
+                  <p>leonegomescoelholeo@gmail.com</p>
                 </div>
               </div>
 

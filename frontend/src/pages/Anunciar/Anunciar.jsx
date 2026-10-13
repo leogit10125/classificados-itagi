@@ -1,6 +1,7 @@
 // src/pages/Anunciar/Anunciar.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config/api";
 import "./Anunciar.css";
 
 function Anunciar() {
@@ -83,7 +84,7 @@ function Anunciar() {
     if (!token) return;
     
     try {
-      const response = await fetch('http://localhost:3000/api/pacotes/creditos', {
+      const response = await fetch(`${API_URL}/pacotes/creditos`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -98,7 +99,7 @@ function Anunciar() {
   // NOVA FUNÇÃO: Carregar pacotes
   const carregarPacotes = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/pacotes');
+      const response = await fetch(`${API_URL}/pacotes`);
       const data = await response.json();
       setPacotes(data);
     } catch (err) {
@@ -110,7 +111,7 @@ function Anunciar() {
   const comprarPacote = async (pacote) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:3000/api/pacotes/comprar', {
+      const response = await fetch(`${API_URL}/pacotes/comprar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -200,7 +201,7 @@ function Anunciar() {
 
       console.log('📤 Enviando anúncio...');
       
-      const response = await fetch('http://localhost:3000/api/ads', {
+      const response = await fetch(`${API_URL}/ads`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -1,14 +1,10 @@
-import "./GalleryManager.css";
+import { UPLOADS_URL } from "../../../config/api";
 
-function GalleryManager({
-    anuncio,
-    onFilesChange
-}) {
+function GalleryManager({ anuncio, onFilesChange }) {
 
     if (!anuncio) return null;
 
     return (
-
         <section className="gallery-manager">
 
             <h2>📷 Imagens</h2>
@@ -17,14 +13,13 @@ function GalleryManager({
 
                 {(anuncio.imagens || []).map((img, index) => (
 
-                    <div
-                        key={index}
-                        className="gallery-item"
-                    >
+                    <div key={index} className="gallery-item">
+
                         <img
-                            src={img}
-                            alt=""
+                            src={`${UPLOADS_URL}/${img}`}
+                            alt={`Imagem ${index + 1}`}
                         />
+
                     </div>
 
                 ))}
@@ -39,16 +34,18 @@ function GalleryManager({
                     type="file"
                     multiple
                     accept="image/*"
-                    onChange={(e)=>onFilesChange(e.target.files)}
+                    onChange={(e) => {
+                        if (onFilesChange) {
+                            onFilesChange(e.target.files);
+                        }
+                    }}
                     hidden
                 />
 
             </label>
 
         </section>
-
     );
-
 }
 
 export default GalleryManager;

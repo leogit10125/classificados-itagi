@@ -1,0 +1,59 @@
+/* Container principal em grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    width: 100%;
+    margin: 20px 0;
+
+}
+
+/* Estilo individual de cada card */
+.stat-card {
+    background-color: rgb(46, 120, 184);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efeito ao passar o mouse */
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+    border-color: #cbd5e1;
+}
+
+/* Ícone (Emoji) */
+.stat-card span {
+    font-size: 24px;
+    margin-bottom: 10px;
+    background: #f1f5f9;
+    padding: 8px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Valor principal (número ou status) */
+.stat-card strong {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+/* Rótulo pequeno (legenda) */
+.stat-card small {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
