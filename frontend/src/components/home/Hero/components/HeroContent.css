@@ -1,0 +1,65 @@
+.hero-content{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    gap:14px;
+
+}
+
+.hero-description{
+
+    color:#d7e2f0;
+
+    line-height:1.5;
+
+}
+
+.hero-meta{
+
+    color:#dbeafe;
+
+    font-size:.85rem;
+
+}
+
+.hero-button{
+
+    background:none;
+
+    border:none;
+
+    color:#facc15;
+
+    font-size:.90rem;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+.hero-button:hover{
+
+    color:white;
+
+}
+
+@media(max-width:900px){
+
+.hero-content{
+
+    align-items:center;
+
+}
+
+.hero-description{
+
+    text-align:center;
+
+}
+
+}

@@ -1,0 +1,25 @@
+**/node_modules/
+**/dist/
+/backups/
+*.bak*
+/vite
+/classificados-itagi@0.0.0
+/package.json.backup-deploy
+.env
+.env.*
+!.env.example
+
+# Uploads locais de usuários
+backend/uploads/
+
+# Cache e arquivos temporários do Vite
+**/.vite/
+
+# Backups locais
+*.bak*
+*.backup*
+
+# Arquivos de diagnóstico local
+backend/teste.json
+backend/testar-banco.js
+backend/testar-conexao-detailed.js

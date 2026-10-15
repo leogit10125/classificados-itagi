@@ -1,0 +1,160 @@
+/* =========================================
+   CATEGORIAS
+========================================= */
+
+.categories {
+    width: 100%;
+    max-width: 1280px;
+
+    margin: 28px auto;
+
+    padding: 0 20px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   CABEÇALHO
+========================================= */
+
+.categories-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.section-badge {
+    font-size: 1rem;
+
+    font-weight: 500;
+
+    color: #17243a;
+}
+
+
+/* =========================================
+   CARROSSEL
+========================================= */
+
+.categories-grid {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 16px;
+
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scroll-behavior: smooth;
+
+    padding: 4px 4px 12px;
+
+    box-sizing: border-box;
+
+    scrollbar-width: none;
+}
+
+.categories-grid::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================
+   DICA DO CARROSSEL
+========================================= */
+
+.categories-hint {
+    text-align: center;
+
+    margin-top: 10px;
+
+    font-size: .78rem;
+
+    color: #64748b;
+
+    animation: moveHint 2s infinite;
+}
+
+@keyframes moveHint {
+
+    0% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(6px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .categories {
+
+        margin: 24px auto;
+
+        padding: 0 16px;
+
+    }
+
+    .categories-header {
+
+        margin-bottom: 14px;
+
+    }
+
+    .section-badge {
+
+        font-size: .95rem;
+
+    }
+
+    .categories-grid {
+
+        gap: 14px;
+
+        padding-left: 2px;
+        padding-right: 2px;
+
+    }
+
+}
+
+
+/* =========================================
+   DESKTOP
+========================================= */
+
+@media (min-width: 901px) {
+
+    .categories {
+
+        margin-top: 26px;
+
+        margin-bottom: 28px;
+
+    }
+
+    .categories-grid {
+
+        gap: 18px;
+
+    }
+
+}

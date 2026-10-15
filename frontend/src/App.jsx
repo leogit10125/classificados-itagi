@@ -1,0 +1,72 @@
+import { Routes, Route } from "react-router-dom";
+import Menu from "./components/layout/Menu/Menu";
+import Footer from "./components/layout/Footer/Footer";
+//import ScrollToTop from "./components/ScrollToTop";
+
+// Pages (Apontando para a pasta correta da Home)
+import Home from "./pages/Home/Home"; 
+import CategoryPage from "./pages/CategoryPage";
+import AdDetail from "./pages/AdDetail";
+import Anunciar from "./pages/Anunciar";
+import SearchResults from './pages/SearchResults/SearchResults';
+import EditarAnuncio from "./pages/EditarAnuncio/EditarAnuncio";
+import MeusAnuncios from "./pages/MeusAnuncios/MeusAnuncios";
+import CategoriesPage from "./pages/Categories";
+// Auth
+import Perfil from "./pages/Perfil";
+import Login from "./pages/Auth/Login"
+import Registro from "./pages/Auth/Registro"
+import RecuperarSenha from "./pages/RecuperarSenha"
+import RedefinirSenha from "./pages/RedefinirSenha"
+
+// Institucional
+import Sobre from "./pages/institucional/Sobre"
+import Politicas from "./pages/institucional/Politicas"
+import Termos from "./pages/institucional/Termos"
+import Contato from "./pages/institucional/Contato"
+import Destaques from "./pages/Destaques";
+
+// Blog
+import Blog from "./pages/Blog/Blog"
+import Post from "./pages/Blog/Post"
+import Categoria from "./pages/Blog/Categoria"
+
+function App() {
+  return (
+    <>
+      <Menu />
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/categoria/:slug" element={<CategoryPage />} />
+        <Route path="/anuncio/:id" element={<AdDetail />} />
+        <Route path="/anunciar" element={<Anunciar />} />
+        <Route path="/buscar" element={<SearchResults />} />
+        <Route path="/editar-anuncio/:id" element={<EditarAnuncio />} />
+        <Route path="/meus-anuncios" element={<MeusAnuncios />} />
+        <Route path="/destaques" element={<Destaques />} />
+        <Route path="/categorias" element={<CategoriesPage />} />
+    
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+        <Route path="/perfil" element={<Perfil />} />
+
+        <Route path="/sobre" element={<Sobre />} />
+        <Route path="/politicas" element={<Politicas />} />
+        <Route path="/termos" element={<Termos />} />
+        <Route path="/contato" element={<Contato />} />
+
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<Post />} />
+        <Route path="/blog/categoria/:categoria" element={<Categoria />} />
+      </Routes>
+
+      <Footer />
+    </>
+  )
+}
+
+
+export default App

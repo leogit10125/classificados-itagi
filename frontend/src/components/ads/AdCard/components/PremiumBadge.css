@@ -1,0 +1,25 @@
+.premium-badge{
+
+    position:absolute;
+
+    top:14px;
+
+    left:14px;
+
+    padding:6px 12px;
+
+    border-radius:30px;
+
+    background:linear-gradient(135deg,#fcf4e6,#aa7b05);
+
+    color:#fff;
+
+    font-size:.72rem;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+    z-index:5;
+
+}

@@ -1,0 +1,22 @@
+.profile-layout{
+    display:flex;
+    min-height:calc(100vh - 140px);
+    background:#f5f7fb;
+}
+
+.profile-content{
+    flex:1;
+    padding:30px;
+}
+
+@media(max-width:900px){
+
+    .profile-layout{
+        flex-direction:column;
+    }
+
+    .profile-content{
+        padding:20px;
+    }
+
+}

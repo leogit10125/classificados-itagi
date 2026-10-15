@@ -1,0 +1,61 @@
+.carousel-button{
+
+    position:absolute;
+
+    top:104%;
+
+    transform:translateY(-50%);
+
+    width:32px;
+
+    height:32px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#f5dc4f;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.12);
+
+    cursor:pointer;
+
+    z-index:20;
+
+    font-size:30px;
+
+    color:#1e3a8a;
+
+    transition:.25s;
+
+}
+
+.carousel-button:hover{
+
+    transform:translateY(-50%) scale(1.08);
+
+    box-shadow:0 12px 30px rgba(0,0,0,.18);
+
+}
+
+
+
+.carousel-button.right{
+
+    right:-22px;
+
+}
+
+@media(max-width:768px){
+
+    .carousel-button{
+
+        width:42px;
+
+        height:42px;
+
+        font-size:24px;
+
+    }
+
+}

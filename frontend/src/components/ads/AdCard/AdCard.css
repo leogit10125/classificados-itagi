@@ -1,0 +1,211 @@
+
+/* ==========================================
+   CARD DO ANÚNCIO — ITAGI CLASSIFICADOS
+========================================== */
+
+.ad-card-link {
+    display: block;
+    width: 220px;
+    min-width: 220px;
+    color: inherit;
+    text-decoration: none;
+}
+
+/* CARD COM ALTURA PADRONIZADA */
+
+.ad-card {
+    width: 100%;
+    height: 350px;
+    min-height: 350px;
+    max-height: 350px;
+
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    align-self: stretch;
+
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.07);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.ad-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+/* IMAGEM — MAIS ESPAÇO PARA O PRODUTO */
+
+.ad-image-area {
+    position: relative;
+    width: 100%;
+    height: 175px;
+    min-height: 175px;
+    max-height: 175px;
+    flex-shrink: 0;
+
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.ad-image-area img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* CONTEÚDO — OCUPA O ESPAÇO RESTANTE */
+
+.ad-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+
+    padding: 10px 12px;
+    gap: 7px;
+    overflow: hidden;
+}
+
+/* INFORMAÇÕES DO ANÚNCIO */
+
+.ad-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    gap: 5px;
+    overflow: hidden;
+}
+
+/* PREÇO */
+
+.ad-price {
+    flex-shrink: 0;
+    margin: 0;
+
+    font-size: 1.3rem;
+    line-height: 1.2;
+    font-weight: 800;
+    color: #2e7d32;
+}
+
+/* TÍTULO — NO MÁXIMO DUAS LINHAS */
+
+.ad-title {
+    display: -webkit-box;
+    flex-shrink: 0;
+    margin: 0;
+    overflow: hidden;
+
+    color: #1e293b;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.35;
+
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow-wrap: anywhere;
+}
+
+.ad-title:hover {
+    color: #2563eb;
+}
+
+/* CATEGORIA, LOCALIZAÇÃO E ESTATÍSTICAS */
+
+.ad-category,
+.ad-location,
+.ad-stats {
+    flex-shrink: 0;
+    margin: 0;
+
+    font-size: 0.76rem;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ad-category,
+.ad-location {
+    color: #64748b;
+}
+
+.ad-stats {
+    color: #94a3b8;
+}
+
+/* BOTÕES/AÇÕES NO RODAPÉ */
+
+.ad-content > :last-child {
+    flex-shrink: 0;
+}
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+    .ad-card-link {
+        width: 190px;
+        min-width: 190px;
+    }
+
+    .ad-card {
+        height: 320px;
+        min-height: 320px;
+        max-height: 320px;
+        border-radius: 10px;
+    }
+
+    .ad-image-area {
+        height: 155px;
+        min-height: 155px;
+        max-height: 155px;
+    }
+
+    .ad-content {
+        padding: 9px 10px;
+        gap: 6px;
+    }
+
+    .ad-info {
+        gap: 4px;
+    }
+
+    .ad-price {
+        font-size: 1.2rem;
+    }
+
+    .ad-title {
+        font-size: 0.88rem;
+    }
+
+    .ad-category,
+    .ad-location,
+    .ad-stats {
+        font-size: 0.72rem;
+    }
+}
+
+/* ACESSIBILIDADE */
+
+@media (prefers-reduced-motion: reduce) {
+    .ad-card {
+        transition: none;
+    }
+
+    .ad-card:hover {
+        transform: none;
+    }
+}

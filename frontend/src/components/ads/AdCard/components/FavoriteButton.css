@@ -1,0 +1,41 @@
+.favorite-button{
+
+    position:absolute;
+
+    top:14px;
+
+    right:14px;
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.92);
+
+    backdrop-filter:blur(8px);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    z-index:5;
+
+}
+
+.favorite-button:hover{
+
+    transform:scale(1.12);
+
+    background:#fff;
+
+}

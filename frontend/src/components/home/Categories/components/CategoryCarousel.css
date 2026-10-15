@@ -1,0 +1,90 @@
+/* =========================================
+   CARROSSEL DE CATEGORIAS
+========================================= */
+
+.category-carousel {
+    position: relative;
+
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+}
+
+
+/* =========================================
+   LISTA
+========================================= */
+
+.category-carousel .categories-grid {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 18px;
+
+    width: 100%;
+
+    min-width: 0;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scroll-behavior: smooth;
+
+    scrollbar-width: none;
+
+    padding: 6px 8px 14px;
+
+    box-sizing: border-box;
+}
+
+.category-carousel .categories-grid::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================
+   NÃO DEIXAR OS CARDS ENCOLHEREM
+========================================= */
+
+.category-carousel .categories-grid > * {
+
+    flex: 0 0 auto;
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .category-carousel .categories-grid {
+
+        gap: 14px;
+
+        padding: 6px 4px 14px;
+
+    }
+
+}
+
+
+/* =========================================
+   DESKTOP
+========================================= */
+
+@media (min-width: 769px) {
+
+    .category-carousel .categories-grid {
+
+        gap: 18px;
+
+    }
+
+}

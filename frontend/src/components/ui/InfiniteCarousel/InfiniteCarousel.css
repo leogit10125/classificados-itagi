@@ -1,0 +1,40 @@
+
+
+
+.infinite-carousel{
+
+    width:100%;
+
+    overflow-x:auto;
+
+    overflow-y:hidden;
+
+    scrollbar-width:none;
+
+    -ms-overflow-style:none;
+
+    padding:8px 0;
+
+    cursor:grab;
+
+}
+
+.infinite-carousel::-webkit-scrollbar{
+
+    display:none;
+
+}
+
+.infinite-carousel-track{
+
+    display:flex;
+
+    align-items:stretch;
+
+    gap:20px;
+
+    width:max-content;
+
+    padding:0 10px;
+
+}

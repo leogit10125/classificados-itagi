@@ -1,0 +1,288 @@
+/* ===========================================
+   CATEGORY CARD
+=========================================== */
+
+.category-card {
+
+    width: 120px;
+    min-width: 120px;
+    height: 110px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: flex-start;
+
+    padding: 14px 8px 10px;
+
+    box-sizing: border-box;
+
+    text-decoration: none;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 6px 18px rgba(15, 23, 42, .06);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        border-color .25s ease;
+}
+
+
+/* ===========================================
+   HOVER
+=========================================== */
+
+.category-card:hover {
+
+    transform: translateY(-4px);
+
+    border-color: #cbd5e1;
+
+    box-shadow:
+        0 12px 28px rgba(15, 23, 42, .12);
+}
+
+
+/* ===========================================
+   ÍCONE
+=========================================== */
+
+.category-icon-wrapper {
+
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 8px;
+
+    border-radius: 15px;
+
+    background: #0b1930;
+
+    color: #ffffff;
+
+    transition:
+        transform .25s ease,
+        background .25s ease;
+}
+
+
+.category-card:hover .category-icon-wrapper {
+
+    transform: translateY(-2px);
+
+    background: #142b4d;
+}
+
+
+/* ===========================================
+   ÍCONE INTERNO
+=========================================== */
+
+.category-icon {
+
+    width: 25px;
+    height: 25px;
+
+    color: #ffffff;
+
+    transition: transform .25s ease;
+}
+
+
+.category-card:hover .category-icon {
+
+    transform: scale(1.06);
+}
+
+
+/* ===========================================
+   NOME
+=========================================== */
+
+.category-card h3 {
+
+    width: 100%;
+
+    height: 32px;
+
+    margin: 0;
+
+    padding: 0 2px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    color: #334155;
+
+    font-size: .82rem;
+
+    font-weight: 600;
+
+    line-height: 1.15;
+
+    text-align: center;
+
+    overflow-wrap: break-word;
+}
+
+
+/* quantidade permanece escondida */
+
+.category-card span {
+
+    display: none;
+}
+
+
+/* ===========================================
+   MOBILE
+=========================================== */
+
+@media (max-width: 768px) {
+
+    .category-card {
+
+        width: 76px;
+        min-width: 76px;
+        max-width: 76px;
+
+        height: 78px;
+
+        padding: 0;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: flex-start;
+
+        background: transparent;
+
+        border: none;
+
+        border-radius: 0;
+
+        box-shadow: none;
+    }
+
+
+    .category-card:hover {
+
+        transform: none;
+
+        border: none;
+
+        box-shadow: none;
+    }
+
+
+    /* ===================================
+       BOTÃO DO ÍCONE MOBILE
+    =================================== */
+
+    .category-icon-wrapper {
+
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
+
+        margin-bottom: 5px;
+
+        border-radius: 13px;
+
+        background: #0b1930;
+
+        box-shadow:
+            0 4px 10px rgba(11, 25, 48, .18);
+    }
+
+
+    .category-card:hover .category-icon-wrapper {
+
+        transform: none;
+
+        background: #0b1930;
+    }
+
+
+    .category-icon {
+
+        width: 21px;
+        height: 21px;
+
+        color: #ffffff;
+    }
+
+
+    /* ===================================
+       NOME MOBILE
+    =================================== */
+
+    .category-card h3 {
+
+        width: 76px;
+
+        height: 27px;
+
+        margin: 0;
+
+        padding: 0 2px;
+
+        display: flex;
+
+        align-items: flex-start;
+        justify-content: center;
+
+        color: #475569;
+
+        font-size: 10px;
+
+        font-weight: 600;
+
+        line-height: 1.05;
+
+        text-align: center;
+
+        overflow-wrap: break-word;
+    }
+
+}
+
+
+/* ===========================================
+   CATEGORIA ATIVA
+   =========================================== */
+
+.category-card.active .category-icon-wrapper {
+
+    background: #facc15;
+
+    color: #0b1930;
+}
+
+
+.category-card.active .category-icon {
+
+    color: #0b1930;
+}

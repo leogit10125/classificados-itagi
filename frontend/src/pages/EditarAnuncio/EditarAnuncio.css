@@ -1,0 +1,40 @@
+.edit-page{
+
+    width:100%;
+    min-height:100vh;
+
+    background:#f5f7fb;
+
+    padding:40px 0;
+
+}
+
+.edit-container{
+
+    width:min(1200px,95%);
+
+    margin:auto;
+
+}
+
+.edit-header{
+
+    margin-bottom:30px;
+
+}
+
+.edit-header h1{
+
+    font-size:34px;
+
+    color:#0f172a;
+
+    margin-bottom:8px;
+
+}
+
+.edit-header p{
+
+    color:#64748b;
+
+}

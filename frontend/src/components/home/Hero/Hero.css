@@ -1,0 +1,167 @@
+.hero-premium{
+
+    position:relative;
+
+    width:98%;
+    max-width:1400px;
+
+    height:340px;
+
+    margin:18px auto;
+
+    overflow:hidden;
+
+    border-radius:22px;
+
+}
+
+.hero-premium::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(rgba(11,25,48,.60),rgba(11,25,48,.60)),
+        url("/images/itagi.jpg");
+
+    background-size:cover;
+    background-position:center;
+
+    z-index:0;
+
+}
+
+.hero-premium-content{
+
+    position:relative;
+
+    z-index:5;
+
+    height:100%;
+
+    display:grid;
+
+    grid-template-columns:260px 1fr 220px;
+
+    align-items:center;
+
+    gap:30px;
+
+    padding:20px 35px;
+
+}
+
+.hero-left{
+
+    display:flex;
+
+    align-items:center;
+
+}
+
+.hero-center{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+.hero-right{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    align-items:center;
+
+}
+
+.hero-badge-top{
+
+    color:#ffd54f;
+
+    font-size:.90rem;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    margin-bottom:12px;
+
+}
+
+.hero-image-title{
+
+    margin-top:14px;
+
+    color:white;
+
+    font-size:1.35rem;
+
+    font-weight:700;
+
+    text-shadow:0 3px 12px rgba(0,0,0,.5);
+
+}
+
+/* =======================
+   MOBILE
+======================= */
+
+@media(max-width:900px){
+
+.hero-premium{
+
+    height:310px;
+
+}
+
+.hero-premium-content{
+
+    grid-template-columns:1fr;
+
+    gap:8px;
+
+    text-align:center;
+
+    padding:14px;
+
+}
+
+.hero-left{
+
+    order:3;
+
+    justify-content:center;
+
+}
+
+.hero-center{
+
+    order:1;
+
+}
+
+.hero-right{
+
+    order:2;
+
+    justify-content:center;
+
+}
+
+.hero-image-title{
+
+    font-size:1rem;
+
+}
+
+}

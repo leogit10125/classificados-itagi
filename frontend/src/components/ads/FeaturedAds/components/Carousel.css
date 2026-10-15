@@ -1,0 +1,31 @@
+.featured-carousel{
+
+    position:relative;
+
+    width:100%;
+
+}
+
+.featured-track{
+
+    display:flex;
+
+    gap:20px;
+
+    overflow-x:auto;
+
+    overflow-y:hidden;
+
+    scroll-behavior:smooth;
+
+    padding:10px 6px 20px;
+
+    scrollbar-width:none;
+
+}
+
+.featured-track::-webkit-scrollbar{
+
+    display:none;
+
+}

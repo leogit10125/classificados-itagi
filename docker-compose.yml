@@ -1,0 +1,58 @@
+services:
+  mysql:
+    image: mariadb:10.6
+    container_name: itagi-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Configure MYSQL_ROOT_PASSWORD no .env}
+      MYSQL_DATABASE: itagi_classificados
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    container_name: itagi-backend
+    restart: always
+
+    env_file:
+      - ./backend/.env.cloudinary
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/uploads:/app/uploads
+
+    environment:
+      - PORT=3000
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD:?Configure DB_PASSWORD no .env}
+      - DB_NAME=itagi_classificados
+      - JWT_SECRET=${JWT_SECRET:?Configure JWT_SECRET no .env}
+      - NODE_ENV=development
+
+    depends_on:
+      - mysql
+
+  frontend:
+    build: ./frontend
+    container_name: itagi-frontend
+    restart: always
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

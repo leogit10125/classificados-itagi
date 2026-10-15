@@ -1,0 +1,135 @@
+.meus-anuncios-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.meus-anuncios-container h2 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.lista-meus-anuncios {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.item-anuncio {
+  display: flex;
+  gap: 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  transition: box-shadow 0.3s;
+}
+
+.item-anuncio:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.imagem-area img {
+  width: 100px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.info {
+  flex: 1;
+}
+
+.info h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.info .preco {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2e7d32;
+  margin: 5px 0;
+}
+
+.info .categoria, .info .data {
+  color: #666;
+  font-size: 12px;
+  margin: 3px 0;
+}
+
+.info .descricao {
+  color: #555;
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.botoes-acao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn-edit {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-edit:hover {
+  background-color: #0056b3;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
+
+.sem-anuncios {
+  text-align: center;
+  padding: 50px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.sem-anuncios button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .item-anuncio {
+    flex-direction: column;
+  }
+  
+  .botoes-acao {
+    flex-direction: row;
+  }
+  
+  .imagem-area img {
+    width: 100%;
+    height: auto;
+  }
+}
