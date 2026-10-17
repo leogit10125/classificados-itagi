@@ -277,6 +277,15 @@ app.use((req, res) => {
 // INICIA SERVIDOR
 // =====================================
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Backend rodando em: http://localhost:${PORT}`);
-});
+const migrarBanco = require('./scripts/migrar-banco');
+
+migrarBanco()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Backend rodando na porta ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('[MIGRAÇÃO] Inicialização interrompida:', error.message);
+    process.exit(1);
+  });
