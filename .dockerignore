@@ -3,4 +3,6 @@ dist
 .vite
 .git
 .gitignore
-npm-debug.log
+npm-debug.log**/.env
+**/.env.*
+!**/.env.example
