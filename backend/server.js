@@ -297,12 +297,12 @@ app.use((req, res) => {
 // =====================================
 // INICIA SERVIDOR
 // =====================================
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.BACKEND_PORT || process.env.PORT || 3000;
 const migrarBanco = require('./scripts/migrar-banco');
 
 migrarBanco()
   .then(() => {
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`Backend rodando na porta ${PORT}`);
     });
   })
