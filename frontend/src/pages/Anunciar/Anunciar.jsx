@@ -1,6 +1,7 @@
 // src/pages/Anunciar/Anunciar.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import imageCompression from 'browser-image-compression';
 import { API_URL } from "../../config/api";
 import "./Anunciar.css";
 
@@ -144,7 +145,7 @@ function Anunciar() {
     carregarCreditos();
   }, []);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
     
     if (files.length > 5) {
@@ -152,14 +153,54 @@ function Anunciar() {
       return;
     }
 
-    setImages(files);
-    
-    // Limpar previews anteriores
-    previewImages.forEach(url => URL.revokeObjectURL(url));
-    
-    // Criar novos previews
-    const previews = files.map(file => URL.createObjectURL(file));
-    setPreviewImages(previews);
+    if (files.length === 0) return;
+
+    setLoading(true);
+
+    // Opções de compressão: no máximo ~800 KB, 1280px e convertido para WebP
+    const options = {
+      maxSizeMB: 0.8,
+      maxWidthOrHeight: 1280,
+      useWebWorker: true,
+      fileType: 'image/webp'
+    };
+
+    try {
+      const compressedFiles = [];
+
+      for (const file of files) {
+        if (file.type.startsWith('image/')) {
+          // Comprime e converte
+          const compressedBlob = await imageCompression(file, options);
+          
+          // Garante o nome com extensão .webp
+          const nomeSemExtensao = file.name.replace(/\.[^/.]+$/, "");
+          const novoArquivo = new File([compressedBlob], `${nomeSemExtensao}.webp`, {
+            type: 'image/webp'
+          });
+          
+          compressedFiles.push(novoArquivo);
+        } else {
+          compressedFiles.push(file);
+        }
+      }
+
+      // Salva no estado os arquivos já leves e comprimidos
+      setImages(compressedFiles);
+      
+      // Limpar previews anteriores
+      previewImages.forEach(url => URL.revokeObjectURL(url));
+      
+      // Criar novos previews a partir das imagens comprimidas
+      const previews = compressedFiles.map(file => URL.createObjectURL(file));
+      setPreviewImages(previews);
+
+    } catch (error) {
+      console.error("Erro ao comprimir imagem:", error);
+      alert("Erro ao processar as fotos. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {

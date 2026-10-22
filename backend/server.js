@@ -261,6 +261,27 @@ app.get('/api/test', async (req, res) => {
     res.status(500).json({ error: 'Erro no banco', detalhes: error.message });
   }
 });
+// =====================================
+// SERVIR O FRONTEND REACT EM PRODUÇÃO
+// =====================================
+const path = require('path');
+const fs = require('fs');
+
+const distPath = path.join(__dirname, '../frontend/dist');
+
+if (fs.existsSync(distPath)) {
+  console.log('✅ Servindo frontend React da pasta dist');
+  app.use(express.static(distPath));
+
+  app.get('*', (req, res, next) => {
+    // Se a rota for de API e não existiu, deixa cair no erro 404 abaixo
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    // Caso contrário, entrega a tela do React!
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
 
 // =====================================
 // MIDDLEWARE PARA ROTAS NÃO ENCONTRADAS
