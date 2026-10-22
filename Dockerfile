@@ -17,7 +17,7 @@ WORKDIR /app
 
 COPY --from=backend-builder /app/backend ./backend
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
-COPY deploy/nginx.conf /etc/nginx/http.d/default.conf
+COPY deploy/nginx.conf /etc/nginx/nginx.conf
 COPY deploy/start.sh /start.sh
 
 RUN chmod +x /start.sh
