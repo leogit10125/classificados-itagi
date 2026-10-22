@@ -264,7 +264,7 @@ app.get('/api/test', async (req, res) => {
 // =====================================
 // SERVIR O FRONTEND REACT EM PRODUÇÃO
 // =====================================
-const path = require('path');
+
 const fs = require('fs');
 
 const distPath = path.join(__dirname, '../frontend/dist');
