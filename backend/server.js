@@ -273,12 +273,10 @@ if (fs.existsSync(distPath)) {
   console.log('✅ Servindo frontend React da pasta dist');
   app.use(express.static(distPath));
 
-  app.get('*', (req, res, next) => {
-    // Se a rota for de API e não existiu, deixa cair no erro 404 abaixo
+  app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
-    // Caso contrário, entrega a tela do React!
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
