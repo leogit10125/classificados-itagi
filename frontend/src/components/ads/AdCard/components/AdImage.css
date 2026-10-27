@@ -1,51 +1,33 @@
-.ad-image{
-
-    width:100%;
-
-    aspect-ratio:16/9;
-
-    overflow:hidden;
-
-    position:relative;
-
-    border-radius:18px 18px 0 0;
-
-    background:#f8fafc;
-
+.ad-image {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    background: #ffffff;
 }
 
-.ad-image img{
-
-    width:100%;
-
-    height:100%;
-
-    object-fit:cover;
-
-    transition:.45s;
-
+.ad-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* A imagem cobre 100% de ponta a ponta */
+    object-position: center;
+    display: block;
+    transition: transform 0.3s ease;
 }
 
-.ad-card-v2:hover .ad-image img{
-
-    transform:scale(1.08);
-
+.ad-card:hover .ad-image img {
+    transform: scale(1.04);
 }
 
-.image-placeholder{
-
-    width:100%;
-
-    height:100%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    font-size:48px;
-
-    background:#eef2ff;
-
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    background: #f8fafc;
+    color: #94a3b8;
 }

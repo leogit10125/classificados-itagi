@@ -1,65 +1,92 @@
-.ad-info{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:8px;
-
+.ml-ad-info {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
 }
 
-.ad-price{
-
-    font-size:1.25rem;
-
-    font-weight:700;
-
-    color:#2563eb;
-
+/* TÍTULO */
+.ml-ad-title {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #1f2937;
+    line-height: 1.35;
+    margin: 0;
+    text-transform: capitalize;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.ad-title{
-
-    text-decoration:none;
-
-    color:#1e293b;
-
-    font-size:1rem;
-
-    font-weight:700;
-
-    line-height:1.4;
-
-    transition:.25s;
-
+/* ESTRELAS ESTILO MERCADO LIVRE / AMAZON */
+.ml-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.78rem;
+    margin: 3px 0;
 }
 
-.ad-title:hover{
-
-    color:#2563eb;
-
+.ml-stars {
+    color: #f59e0b; /* Amarelo dourado */
+    font-size: 0.85rem;
+    letter-spacing: 1px;
 }
 
-.ad-category{
-
-    font-size:.80rem;
-
-    color:#64748b;
-
+.ml-score {
+    font-weight: 700;
+    color: #111827;
 }
 
-.ad-location{
-
-    font-size:.85rem;
-
-    color:#475569;
-
+.ml-reviews {
+    color: #6b7280;
+    font-size: 0.74rem;
 }
 
-.ad-stats{
+/* CONTAINER DE PREÇO */
+.ml-price-container {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    margin: 4px 0 6px 0;
+}
 
-    font-size:.80rem;
+.ml-currency {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+}
 
-    color:#94a3b8;
+.ml-amount {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.5px;
+}
 
+/* RODAPÉ: LOCALIZAÇÃO E CATEGORIA */
+.ml-ad-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.76rem;
+    color: #4b5563;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.ml-location {
+    font-weight: 600;
+    color: #374151;
+}
+
+.ml-category {
+    background: #f1f5f9;
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: #475569;
+    font-size: 0.72rem;
+    font-weight: 500;
 }
