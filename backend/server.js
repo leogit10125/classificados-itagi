@@ -265,12 +265,22 @@ app.get('/api/test', async (req, res) => {
 // SERVIR O FRONTEND REACT EM PRODUÇÃO
 // =====================================
 
+// =====================================
+// SERVIR O FRONTEND REACT EM PRODUÇÃO
+// =====================================
 const fs = require('fs');
 
-const distPath = path.join(__dirname, '../frontend/dist');
+// Procura a pasta do React tanto na Dado Cloud quanto no ambiente local
+const possibleDistPaths = [
+  '/usr/share/nginx/html',
+  path.join(__dirname, '../frontend/dist'),
+  '/app/frontend/dist'
+];
 
-if (fs.existsSync(distPath)) {
-  console.log('✅ Servindo frontend React da pasta dist');
+const distPath = possibleDistPaths.find(p => fs.existsSync(p));
+
+if (distPath) {
+  console.log(`✅ Servindo frontend React da pasta: ${distPath}`);
   app.use(express.static(distPath));
 
   app.use((req, res, next) => {
@@ -280,17 +290,6 @@ if (fs.existsSync(distPath)) {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
-
-// =====================================
-// MIDDLEWARE PARA ROTAS NÃO ENCONTRADAS
-// =====================================
-app.use((req, res) => {
-  console.log(`❌ Rota não encontrada: ${req.method} ${req.url}`);
-  res.status(404).json({
-    error: 'Rota não encontrada',
-    path: req.url
-  });
-});
 
 // =====================================
 // INICIA SERVIDOR
