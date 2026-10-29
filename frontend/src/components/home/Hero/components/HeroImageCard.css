@@ -1,53 +1,39 @@
-/* CONTAINER PRINCIPAL DA MOLDURA */
+/* CONTAINER 100% TRANSPARENTE */
 .hero-image-card {
     position: relative;
-    width: 440px;
-    height: 240px;
-    overflow: hidden;
-    border-radius: 16px;
-    background: #030d1d;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    width: 100%;
+    max-width: 440px;
+    height: 225px;
+    background: transparent !important; /* Zero caixa escura no fundo */
+    border: none !important;            /* Sem borda da caixa */
+    box-shadow: none !important;        /* Sem sombra da caixa */
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: visible;                  /* Permite que a sombra da foto respire */
 }
 
-/* 1. FUNDO DESFOCADO AMBIENTE */
-.hero-image-blur-bg {
-    position: absolute;
-    inset: -10px;
-    background-size: cover;
-    background-position: center;
-    filter: blur(18px) brightness(0.6);
-    opacity: 0.65;
-    transform: scale(1.15);
-    z-index: 1;
-}
-
-/* 2. FOTO PRINCIPAL (100% COMPLETA, SEM CORTE DE TELHADO NEM GRAMADO) */
+/* A PRÓPRIA FOTO FLUTUANDO (Adapta-se a qualquer formato: em pé, quadrada ou deitada) */
 .hero-image-main {
-    position: relative;
-    z-index: 2;
     max-width: 100%;
     max-height: 100%;
     width: auto;
     height: 100%;
-    object-fit: contain; /* MOSTRA 100% DA IMAGEM REAL */
+    object-fit: contain;                /* Mantém o produto 100% inteiro */
     display: block;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    border-radius: 16px;                /* Cantinhos arredondados na própria foto */
+    border: 1px solid rgba(255, 255, 255, 0.25); /* Borda fina iluminada */
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.55); /* Sombra elegante de profundidade */
     transition: transform 0.3s ease;
 }
 
 .hero-image-card:hover .hero-image-main {
-    transform: scale(1.03);
+    transform: scale(1.04);             /* Leve zoom flutuante ao passar o mouse */
 }
 
 /* AJUSTES PARA CELULAR */
 @media (max-width: 900px) {
     .hero-image-card {
-        width: 92%;
-        max-width: 320px;
-        height: 190px;
+        height: 180px;
     }
 }

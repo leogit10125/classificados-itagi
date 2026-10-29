@@ -12,13 +12,7 @@ function HeroImageCard({ ad }) {
 
     return (
         <div className="hero-image-card">
-            {/* 1. Efeito de fundo desfocado com as cores da própria foto */}
-            <div 
-                className="hero-image-blur-bg"
-                style={{ backgroundImage: `url(${imagem})` }}
-            />
-
-            {/* 2. Foto original 100% inteira no centro (sem cortes!) */}
+            {/* Apenas a foto real flutuando */}
             <img
                 src={imagem}
                 alt={ad.titulo}

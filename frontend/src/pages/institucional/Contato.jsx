@@ -44,7 +44,7 @@ function Contato() {
                 <span className="info-icon">📱</span>
                 <div>
                   <strong>WhatsApp:</strong>
-                  <p>(73) 99999-9999</p>
+                  <p>(73) 99957-7988</p>
                 </div>
               </div>
 
