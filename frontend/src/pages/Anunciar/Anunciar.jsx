@@ -113,7 +113,7 @@ function Anunciar() {
     setShowPacotes(true);
   };
 
-  // Processar compra de pacote
+  // Processar compra de pacote com redirecionamento ao Mercado Pago
   const comprarPacote = async (pacote) => {
     const token = localStorage.getItem('token');
     try {
@@ -132,7 +132,7 @@ function Anunciar() {
       const result = await response.json();
 
       if (response.ok && result.init_point) {
-        // Redireciona na hora para a tela de pagamento do Mercado Pago (Pix / Cartão)
+        // Redireciona na hora para o checkout oficial do Mercado Pago (Pix/Cartão)
         window.location.href = result.init_point;
       } else {
         alert(result.error || 'Erro ao gerar pagamento');
@@ -149,15 +149,18 @@ function Anunciar() {
     carregarCreditos();
   }, []);
 
+  // Upload inteligente: permite adicionar fotos aos poucos até o limite de 5
   const handleImageChange = async (e) => {
-    const files = Array.from(e.target.files);
-    
-    if (files.length > 5) {
-      alert("Você pode enviar no máximo 5 imagens.");
+    const novosArquivos = Array.from(e.target.files);
+    if (novosArquivos.length === 0) return;
+
+    // Valida o limite total de 5 fotos
+    const totalFuturo = images.length + novosArquivos.length;
+    if (totalFuturo > 5) {
+      alert(`Você só pode ter no máximo 5 fotos no anúncio. Você já tem ${images.length} e tentou adicionar mais ${novosArquivos.length}.`);
+      e.target.value = '';
       return;
     }
-
-    if (files.length === 0) return;
 
     setLoading(true);
 
@@ -169,32 +172,41 @@ function Anunciar() {
     };
 
     try {
-      const compressedFiles = [];
+      const arquivosComprimidos = [];
+      const novasPreviews = [];
 
-      for (const file of files) {
+      for (const file of novosArquivos) {
         if (file.type.startsWith('image/')) {
           const compressedBlob = await imageCompression(file, options);
           const nomeSemExtensao = file.name.replace(/\.[^/.]+$/, "");
           const novoArquivo = new File([compressedBlob], `${nomeSemExtensao}.webp`, {
             type: 'image/webp'
           });
-          compressedFiles.push(novoArquivo);
-        } else {
-          compressedFiles.push(file);
+          
+          arquivosComprimidos.push(novoArquivo);
+          novasPreviews.push(URL.createObjectURL(novoArquivo));
         }
       }
 
-      setImages(compressedFiles);
-      previewImages.forEach(url => URL.revokeObjectURL(url));
-      const previews = compressedFiles.map(file => URL.createObjectURL(file));
-      setPreviewImages(previews);
+      // Acumula com as fotos que já foram adicionadas anteriormente
+      setImages(prev => [...prev, ...arquivosComprimidos]);
+      setPreviewImages(prev => [...prev, ...novasPreviews]);
 
     } catch (error) {
       console.error("Erro ao comprimir imagem:", error);
       alert("Erro ao processar as fotos. Tente novamente.");
     } finally {
       setLoading(false);
+      // Limpa o campo para poder clicar e adicionar mais fotos novamente
+      e.target.value = '';
     }
+  };
+
+  // Remover foto individualmente pelo botão [✕]
+  const handleRemoverImagem = (indexParaRemover) => {
+    URL.revokeObjectURL(previewImages[indexParaRemover]);
+    setImages(prev => prev.filter((_, index) => index !== indexParaRemover));
+    setPreviewImages(prev => prev.filter((_, index) => index !== indexParaRemover));
   };
 
   const handleSubmit = async (e) => {
@@ -230,6 +242,7 @@ function Anunciar() {
       formDataObj.append('categoria', formData.categoria);
       formDataObj.append('localizacao', formData.localizacao);
       
+      // Adiciona todas as fotos da lista ao envio
       images.forEach((file) => {
         formDataObj.append('imagens', file);
       });
@@ -284,7 +297,7 @@ function Anunciar() {
     <div className="anunciar-container">
       <h2 className="anunciar-title">Criar Novo Anúncio</h2>
       
-      {/* EXIBIÇÃO DE CRÉDITOS + CARD AMARELO ALARANJADO DE COMPRA */}
+      {/* EXIBIÇÃO DE CRÉDITOS + CARD AMARELO-ALARANJADO DE COMPRA */}
       {creditInfo && (
         <div className="credit-info-container">
           <div className="credit-card gratuitos">
@@ -401,25 +414,49 @@ function Anunciar() {
           </small>
         </div>
         
+        {/* ÁREA DE IMAGENS ATUALIZADA (ATÉ 5 FOTOS COM MINIATURAS E EXCLUSÃO) */}
         <div className="form-group">
-          <label>Imagens (máx 5):</label>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-            className="form-input"
-          />
-          
+          <div className="label-fotos-container">
+            <label>Fotos do Anúncio (máximo 5 fotos):</label>
+            <span className="contador-fotos">
+              {images.length}/5 fotos selecionadas
+            </span>
+          </div>
+
+          {/* O campo só aparece enquanto houver espaço para mais fotos */}
+          {images.length < 5 && (
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+              className="form-input"
+              disabled={loading}
+            />
+          )}
+
+          {/* Grade de Fotos com botão [✕] para remover */}
           {previewImages.length > 0 && (
-            <div className="preview-container">
+            <div className="preview-grid">
               {previewImages.map((src, index) => (
-                <img 
-                  key={index}
-                  src={src} 
-                  alt={`Preview ${index + 1}`} 
-                  className="preview-image"
-                />
+                <div key={index} className="preview-card">
+                  <img 
+                    src={src} 
+                    alt={`Foto ${index + 1}`} 
+                    className="preview-img"
+                  />
+                  {index === 0 && (
+                    <span className="tag-capa">Principal</span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoverImagem(index)}
+                    className="btn-remover-foto"
+                    title="Remover esta foto"
+                  >
+                    ✕
+                  </button>
+                </div>
               ))}
             </div>
           )}

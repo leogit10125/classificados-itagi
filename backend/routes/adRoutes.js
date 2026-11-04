@@ -635,58 +635,90 @@ router.post(
    TORNAR ANÚNCIO PREMIUM
 ========================================================== */
 
+/* ==========================================================
+   TORNAR ANÚNCIO PREMIUM (EXIGE E CONSOME 1 CRÉDITO)
+========================================================== */
 router.post(
     "/:id/destaque",
     authMiddleware,
     async (req, res) => {
-
         try {
-
             const { id } = req.params;
             const usuarioId = req.usuario.id;
 
+            // 1. Verificar se o anúncio pertence ao usuário
             const [rows] = await db.query(
-                `
-                SELECT *
-                FROM anuncios
-                WHERE id = ?
-                AND usuario_id = ?
-                `,
+                `SELECT * FROM anuncios WHERE id = ? AND usuario_id = ?`,
                 [id, usuarioId]
             );
 
             if (!rows.length) {
-
                 return res.status(404).json({
                     error: "Anúncio não encontrado."
                 });
-
             }
 
+            const anuncio = rows[0];
+
+            if (anuncio.destaque === 1) {
+                return res.status(400).json({
+                    error: "Este anúncio já está em destaque!"
+                });
+            }
+
+            // 2. Verificar se o usuário possui créditos pagos disponíveis
+            const [userRows] = await db.query(
+                `SELECT id, pacote_anuncios, anuncios_pagos FROM usuarios WHERE id = ?`,
+                [usuarioId]
+            );
+            const usuario = userRows[0];
+            const creditosDisponiveis = (usuario?.pacote_anuncios || 0) + (usuario?.anuncios_pagos || 0);
+
+            // ❌ SE NÃO TEM CRÉDITOS: Bloqueia e avisa que precisa comprar!
+            if (creditosDisponiveis <= 0) {
+                return res.status(402).json({
+                    error: "Você não possui créditos para destacar este anúncio. Adquira um pacote de créditos para ativar o Destaque!",
+                    precisaCreditos: true
+                });
+            }
+
+            // 3. Descontar 1 crédito da conta do usuário
+            if (usuario.pacote_anuncios > 0) {
+                await db.query(
+                    `UPDATE usuarios SET pacote_anuncios = pacote_anuncios - 1 WHERE id = ?`,
+                    [usuarioId]
+                );
+            } else if (usuario.anuncios_pagos > 0) {
+                await db.query(
+                    `UPDATE usuarios SET anuncios_pagos = anuncios_pagos - 1 WHERE id = ?`,
+                    [usuarioId]
+                );
+            }
+
+            // 4. Promover o anúncio para destaque no banco
             await db.query(
-                `
-                UPDATE anuncios
-                SET destaque = 1
-                WHERE id = ?
-                `,
+                `UPDATE anuncios SET destaque = 1 WHERE id = ?`,
                 [id]
+            );
+
+            // 5. Registrar histórico no financeiro
+            await db.query(
+                `INSERT INTO pagamentos (usuario_id, plano, valor, status, metodo) 
+                 VALUES (?, 'destaque_anuncio', 0, 'pago', 'credito_saldo')`,
+                [usuarioId]
             );
 
             res.json({
                 success: true,
-                message: "Anúncio promovido para destaque."
+                message: "🌟 Anúncio promovido para destaque com sucesso! 1 crédito foi utilizado."
             });
 
         } catch (err) {
-
-            console.error(err);
-
+            console.error("❌ Erro ao destacar anúncio:", err);
             res.status(500).json({
-                error: "Erro ao promover anúncio."
+                error: "Erro interno ao promover anúncio."
             });
-
         }
-
     }
 );
 /* ==========================================================
