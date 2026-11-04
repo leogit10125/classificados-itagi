@@ -215,25 +215,14 @@ function SearchResults() {
                             :
 
                             <div className="results-grid">
-
                                 {
-
                                     results.map((ad) => (
-
-                                        <AdCard
-
-                                            key={ad.id}
-
-                                            ad={ad}
-
-                                            imagemUrl={getImagemUrl(ad)}
-
-                                        />
-
+                                       <AdCard
+                                           key={ad.id}
+                                           anuncio={ad}
+                                       />
                                     ))
-
                                 }
-
                             </div>
 
                     )

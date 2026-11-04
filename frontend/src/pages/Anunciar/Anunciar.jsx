@@ -1,6 +1,6 @@
 // src/pages/Anunciar/Anunciar.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import imageCompression from 'browser-image-compression';
 import { API_URL } from "../../config/api";
 import "./Anunciar.css";
@@ -20,7 +20,7 @@ function Anunciar() {
   const [previewImages, setPreviewImages] = useState([]);
   const [loading, setLoading] = useState(false);
   
-  // NOVOS STATES PARA LIMITE DE ANÚNCIOS
+  // STATES PARA LIMITE E COMPRA DE CRÉDITOS
   const [creditInfo, setCreditInfo] = useState(null);
   const [showPacotes, setShowPacotes] = useState(false);
   const [pacotes, setPacotes] = useState([]);
@@ -73,13 +73,12 @@ function Anunciar() {
     { value: 'zumbi', label: 'Zumbi' }
   ];
 
-  // Agrupar localizações por categoria
   const localizacoesAgrupadas = {
     cidades: localizacoes.slice(0, 16),
     povoados: localizacoes.slice(16)
   };
 
-  // NOVA FUNÇÃO: Carregar informações de créditos
+  // Carregar informações de créditos do usuário
   const carregarCreditos = async () => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -97,21 +96,28 @@ function Anunciar() {
     }
   };
 
-  // NOVA FUNÇÃO: Carregar pacotes
+  // Carregar pacotes da API
   const carregarPacotes = async () => {
     try {
       const response = await fetch(`${API_URL}/pacotes`);
       const data = await response.json();
-      setPacotes(data);
+      setPacotes(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Erro ao carregar pacotes:', err);
     }
   };
 
-  // NOVA FUNÇÃO: Comprar pacote
+  // Abrir tela de compra de créditos
+  const handleAbrirCheckout = async () => {
+    await carregarPacotes();
+    setShowPacotes(true);
+  };
+
+  // Processar compra de pacote
   const comprarPacote = async (pacote) => {
     const token = localStorage.getItem('token');
     try {
+      setLoading(true);
       const response = await fetch(`${API_URL}/pacotes/comprar`, {
         method: 'POST',
         headers: {
@@ -119,28 +125,26 @@ function Anunciar() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          pacoteId: pacote.id,
-          quantidade: pacote.quantidade,
-          valor: pacote.preco
+          pacoteId: pacote.id
         })
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        alert(result.message);
-        setShowPacotes(false);
-        await carregarCreditos(); // Recarregar créditos
+      const result = await response.json();
+
+      if (response.ok && result.init_point) {
+        // Redireciona na hora para a tela de pagamento do Mercado Pago (Pix / Cartão)
+        window.location.href = result.init_point;
       } else {
-        const error = await response.json();
-        alert(error.error || 'Erro ao processar compra');
+        alert(result.error || 'Erro ao gerar pagamento');
       }
     } catch (err) {
       console.error('Erro na compra:', err);
-      alert('Erro de conexão');
+      alert('Erro de conexão ao gerar pagamento');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Carregar créditos ao montar o componente
   useEffect(() => {
     carregarCreditos();
   }, []);
@@ -157,7 +161,6 @@ function Anunciar() {
 
     setLoading(true);
 
-    // Opções de compressão: no máximo ~800 KB, 1280px e convertido para WebP
     const options = {
       maxSizeMB: 0.8,
       maxWidthOrHeight: 1280,
@@ -170,28 +173,19 @@ function Anunciar() {
 
       for (const file of files) {
         if (file.type.startsWith('image/')) {
-          // Comprime e converte
           const compressedBlob = await imageCompression(file, options);
-          
-          // Garante o nome com extensão .webp
           const nomeSemExtensao = file.name.replace(/\.[^/.]+$/, "");
           const novoArquivo = new File([compressedBlob], `${nomeSemExtensao}.webp`, {
             type: 'image/webp'
           });
-          
           compressedFiles.push(novoArquivo);
         } else {
           compressedFiles.push(file);
         }
       }
 
-      // Salva no estado os arquivos já leves e comprimidos
       setImages(compressedFiles);
-      
-      // Limpar previews anteriores
       previewImages.forEach(url => URL.revokeObjectURL(url));
-      
-      // Criar novos previews a partir das imagens comprimidas
       const previews = compressedFiles.map(file => URL.createObjectURL(file));
       setPreviewImages(previews);
 
@@ -216,7 +210,7 @@ function Anunciar() {
         return;
       }
 
-      // VERIFICAR SE TEM CRÉDITOS DISPONÍVEIS
+      // Se não tiver créditos suficientes, abre os pacotes
       if (creditInfo) {
         const temGratuito = creditInfo.anunciosGratuitosRestantes > 0;
         const temPago = creditInfo.creditosPagosDisponiveis > 0;
@@ -240,8 +234,6 @@ function Anunciar() {
         formDataObj.append('imagens', file);
       });
 
-      console.log('📤 Enviando anúncio...');
-      
       const response = await fetch(`${API_URL}/ads`, {
         method: 'POST',
         headers: {
@@ -251,9 +243,7 @@ function Anunciar() {
       });
       
       const result = await response.json();
-      console.log('📥 Resposta:', result);
       
-      // VERIFICAR SE PRECISA PAGAR (status 402)
       if (response.status === 402) {
         setPacotes(result.pacotes || []);
         setShowPacotes(true);
@@ -288,14 +278,13 @@ function Anunciar() {
     { value: 'moda', label: 'Moda' },
     { value: 'esportes', label: 'Esportes' },
     { value: 'outros', label: 'Outros' }
-    
   ];
 
   return (
     <div className="anunciar-container">
       <h2 className="anunciar-title">Criar Novo Anúncio</h2>
       
-      {/* NOVO: Exibir informações de créditos */}
+      {/* EXIBIÇÃO DE CRÉDITOS + CARD AMARELO ALARANJADO DE COMPRA */}
       {creditInfo && (
         <div className="credit-info-container">
           <div className="credit-card gratuitos">
@@ -303,14 +292,29 @@ function Anunciar() {
             <strong>{creditInfo.anunciosGratuitosRestantes}</strong>
             <small>restante(s)</small>
           </div>
+
           <div className="credit-card pagos">
             <span>💰 Pagos</span>
             <strong>{creditInfo.creditosPagosDisponiveis}</strong>
             <small>disponível(is)</small>
           </div>
+
+          {/* ⚡ CARD 3: CTA AMARELO-ALARANJADO PARA COMPRA DE CRÉDITOS */}
+          <div 
+            className="credit-card comprar" 
+            onClick={handleAbrirCheckout}
+            role="button"
+            tabIndex={0}
+            title="Clique para comprar créditos para publicar ou destacar anúncios"
+          >
+            <span>⚡ Adquirir</span>
+            <strong className="comprar-btn-text">+ Comprar</strong>
+            <small>Créditos & Destaques</small>
+          </div>
+
           {creditInfo.anunciosGratuitosRestantes === 0 && creditInfo.creditosPagosDisponiveis === 0 && (
             <div className="credit-warning">
-              ⚠️ Você atingiu o limite de anúncios gratuitos. Adquira um pacote!
+              ⚠️ Você atingiu o limite de anúncios gratuitos. Adquira um pacote de créditos!
             </div>
           )}
         </div>
@@ -430,22 +434,22 @@ function Anunciar() {
         </button>
       </form>
 
-      {/* NOVO: Modal de Pacotes */}
+      {/* MODAL DE PACOTES / CHECKOUT */}
       {showPacotes && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>💰 Adquirir Pacote de Anúncios</h2>
-            <p>Você já usou seus 2 anúncios gratuitos. Escolha um pacote:</p>
+            <h2>💰 Adquirir Créditos / Destaques</h2>
+            <p>Escolha um pacote para publicar mais anúncios ou destacar seus produtos em Itagi:</p>
             
             <div className="packages-grid">
               {pacotes.map(pacote => (
                 <div key={pacote.id} className="package-card">
                   <h3>{pacote.nome}</h3>
-                  <p className="quantity">{pacote.quantidade} anúncios</p>
-                  <p className="price">R$ {pacote.preco.toFixed(2)}</p>
+                  <p className="quantity">{pacote.quantidade} créditos</p>
+                  <p className="price">R$ {Number(pacote.preco).toFixed(2)}</p>
                   {pacote.destaque && <span className="badge">⭐ Destaque</span>}
                   <button onClick={() => comprarPacote(pacote)}>
-                    Comprar
+                    Comprar Agora
                   </button>
                 </div>
               ))}

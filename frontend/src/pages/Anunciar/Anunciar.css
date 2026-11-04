@@ -351,7 +351,29 @@ select:focus option:checked {
 .credit-card.pagos {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
+/* ⚡ CARD 3: GRADIENTE AMARELO-ALARANJADO */
+.credit-card.comprar {
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
 
+.credit-card.comprar:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.55);
+}
+
+.credit-card.comprar .comprar-btn-text {
+  font-size: 18px !important;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.22);
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin: 4px 0;
+  display: inline-block;
+}
 .credit-card span {
   font-size: 14px;
   opacity: 0.9;

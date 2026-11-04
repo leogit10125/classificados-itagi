@@ -3,65 +3,143 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middleware/auth');
+const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 
-// Listar pacotes disponíveis
-router.get('/', (req, res) => {
-  res.json([
-    { id: 1, nome: 'Básico', quantidade: 5, preco: 10.00, destaque: false },
-    { id: 2, nome: 'Popular', quantidade: 12, preco: 20.00, destaque: false },
-    { id: 3, nome: 'Destaque', quantidade: 30, preco: 40.00, destaque: true },
-    { id: 4, nome: 'Anúncio Avulso', quantidade: 1, preco: 2.00, destaque: false }
-  ]);
+// Inicializa o Mercado Pago com o token do .env
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN || ''
 });
 
-// Simular compra (aqui você integraria com Mercado Pago, Stripe, etc)
+// Lista fixa dos pacotes oficiais
+const PACOTES_DISPONIVEIS = [
+  { id: 1, nome: 'Básico', quantidade: 5, preco: 10.00, destaque: false },
+  { id: 2, nome: 'Popular', quantidade: 12, preco: 20.00, destaque: false },
+  { id: 3, nome: 'Destaque', quantidade: 30, preco: 40.00, destaque: true },
+  { id: 4, nome: 'Anúncio Avulso', quantidade: 1, preco: 2.00, destaque: false }
+];
+
+// 1. Listar pacotes disponíveis
+router.get('/', (req, res) => {
+  res.json(PACOTES_DISPONIVEIS);
+});
+
+// 2. CRIAR PREFERÊNCIA DE COMPRA (Gera link do Mercado Pago com Pix/Cartão)
 router.post('/comprar', authMiddleware, async (req, res) => {
   try {
     const usuarioId = req.usuario?.id;
-    const { pacoteId, quantidade, valor } = req.body;
+    const { pacoteId } = req.body;
 
     if (!usuarioId) {
       return res.status(401).json({ error: 'Usuário não autenticado' });
     }
 
-    // 💡 Regra 3: Desestruturando o INSERT da transação (Mantenha a tabela se ela existir, ou adapte para 'pagamentos')
-    const [result] = await db.query(
+    const pacote = PACOTES_DISPONIVEIS.find(p => p.id === Number(pacoteId));
+    if (!pacote) {
+      return res.status(404).json({ error: 'Pacote não encontrado' });
+    }
+
+    // Busca dados do usuário (email e nome)
+    const [userRows] = await db.query('SELECT id, nome, email FROM usuarios WHERE id = ?', [usuarioId]);
+    const usuario = userRows[0];
+
+    // Registra intenção de pagamento como 'pendente' no MariaDB
+    const [insertResult] = await db.query(
       `INSERT INTO pagamentos (usuario_id, plano, valor, status, metodo) 
-       VALUES (?, 'pacote', ?, 'pago', 'simulacao')`,
-      [usuarioId, valor]
+       VALUES (?, ?, ?, 'pendente', 'mercadopago')`,
+      [usuarioId, pacote.nome, pacote.preco]
     );
+    const pagamentoIdInterno = insertResult.insertId;
 
-    // 💡 Regra 4: Desestruturando o UPDATE de créditos do usuário
-    await db.query(
-      `UPDATE usuarios 
-       SET pacote_anuncios = pacote_anuncios + ? 
-       WHERE id = ?`,
-      [quantidade, usuarioId]
-    );
+    // URL base do seu site para redirecionamento após o pagamento
+    const siteUrl = process.env.SITE_URL || 'https://www.itagiclassificados.com';
 
-    // 💡 Regra 2: Espera apenas um registro (Rows desestruturado e capturado de forma segura via índice [0])
-    const [rows] = await db.query(
-      'SELECT anuncios_gratuitos_restantes, pacote_anuncios, anuncios_pagos FROM usuarios WHERE id = ?',
-      [usuarioId]
-    );
-    const usuario = rows[0];
-
-    res.json({
-      success: true,
-      message: `Compra realizada! Você agora tem ${usuario?.pacote_anuncios || 0} anúncios pagos disponíveis.`,
-      creditos: {
-        gratuitos: usuario?.anuncios_gratuitos_restantes || 0,
-        pagos: usuario?.pacote_anuncios || 0
+    // Cria a preferência na API do Mercado Pago
+    const preference = new Preference(client);
+    const resultado = await preference.create({
+      body: {
+        items: [
+          {
+            id: String(pacote.id),
+            title: `Pacote ${pacote.nome} - ${pacote.quantidade} Créditos (${pacote.destaque ? 'Destaque' : 'Padrão'})`,
+            quantity: 1,
+            unit_price: Number(pacote.preco),
+            currency_id: 'BRL'
+          }
+        ],
+        payer: {
+          email: usuario?.email || 'cliente@itagiclassificados.com',
+          name: usuario?.nome || 'Cliente Itagi'
+        },
+        metadata: {
+          usuario_id: usuarioId,
+          quantidade_creditos: pacote.quantidade,
+          pagamento_id_interno: pagamentoIdInterno
+        },
+        back_urls: {
+          success: `${siteUrl}/anunciar?pagamento=sucesso`,
+          pending: `${siteUrl}/anunciar?pagamento=pendente`,
+          failure: `${siteUrl}/anunciar?pagamento=falha`
+        },
+        auto_return: 'approved',
+        notification_url: `${siteUrl}/api/pacotes/webhook`
       }
     });
 
+    // Retorna a URL de checkout do Mercado Pago (onde tem Pix e Cartão)
+    res.json({
+      success: true,
+      init_point: resultado.init_point
+    });
+
   } catch (error) {
-    console.error('❌ Erro na compra:', error);
-    res.status(500).json({ error: 'Erro ao processar compra', details: error.message });
+    console.error('❌ Erro ao criar pagamento no Mercado Pago:', error);
+    res.status(500).json({ error: 'Erro ao conectar ao Mercado Pago', details: error.message });
   }
 });
 
-// Verificar status dos créditos
+// 3. WEBHOOK AUTOMÁTICO (Mercado Pago avisa aqui quando o Pix foi pago!)
+router.post('/webhook', async (req, res) => {
+  try {
+    const { type, data } = req.body;
+    const paymentId = data?.id || req.query['data.id'] || req.query.id;
+
+    // Só processa se for notificação de pagamento
+    if (paymentId && (type === 'payment' || req.query.topic === 'payment')) {
+      const payment = new Payment(client);
+      const paymentInfo = await payment.get({ id: paymentId });
+
+      // Se o pagamento foi aprovado (Pix confirmado ou Cartão aprovado)
+      if (paymentInfo.status === 'approved') {
+        const usuarioId = paymentInfo.metadata.usuario_id;
+        const creditos = paymentInfo.metadata.quantidade_creditos;
+        const pagamentoIdInterno = paymentInfo.metadata.pagamento_id_interno;
+
+        // Atualiza status na tabela pagamentos para 'pago'
+        await db.query(
+          `UPDATE pagamentos SET status = 'pago' WHERE id = ?`,
+          [pagamentoIdInterno]
+        );
+
+        // Adiciona os créditos ao usuário no MariaDB automaticamente!
+        await db.query(
+          `UPDATE usuarios SET pacote_anuncios = pacote_anuncios + ? WHERE id = ?`,
+          [creditos, usuarioId]
+        );
+
+        console.log(`✅ Pagamento #${paymentId} aprovado! ${creditos} créditos adicionados ao usuário #${usuarioId}`);
+      }
+    }
+
+    // Mercado Pago exige resposta 200 para confirmar que recebemos a notificação
+    res.sendStatus(200);
+
+  } catch (error) {
+    console.error('❌ Erro no Webhook Mercado Pago:', error);
+    res.sendStatus(500);
+  }
+});
+
+// 4. Verificar status dos créditos
 router.get('/creditos', authMiddleware, async (req, res) => {
   try {
     const usuarioId = req.usuario?.id;
@@ -70,14 +148,12 @@ router.get('/creditos', authMiddleware, async (req, res) => {
       return res.status(401).json({ error: 'Usuário não autenticado' });
     }
     
-    // 💡 Regra 2: Desestruturando dados de um único usuário
     const [userRows] = await db.query(
       'SELECT anuncios_gratuitos_restantes, pacote_anuncios, anuncios_pagos FROM usuarios WHERE id = ?',
       [usuarioId]
     );
     const usuario = userRows[0];
 
-    // 💡 Regra 2: Desestruturando retorno de agregação COUNT(*)
     const [adRows] = await db.query(
       'SELECT COUNT(*) as total FROM anuncios WHERE usuario_id = ?',
       [usuarioId]
