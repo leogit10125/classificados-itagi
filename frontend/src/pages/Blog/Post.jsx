@@ -1,6 +1,7 @@
 // src/pages/blog/Post.jsx
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
+import DOMPurify from 'dompurify';
 import "./Blog.css"
 
 // Dados mockados dos posts (depois virão do banco)
@@ -152,9 +153,10 @@ function Post() {
             <img src={post.image} alt={post.title} />
           </div>
 
+          // COMO DEVE FICAR (PROTEGIDO):
           <div 
             className="post-content"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
           />
 
           <div className="post-footer">

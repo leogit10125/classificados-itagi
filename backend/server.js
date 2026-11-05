@@ -5,14 +5,16 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
-const bcrypt = require('bcryptjs'); // 💡 Unificado para bcryptjs para evitar quebras em ambientes Docker/Alpine
+const fs = require('fs');
+const bcrypt = require('bcryptjs'); // Unificado para bcryptjs
+const rateLimit = require('express-rate-limit');
+const jwt = require('jsonwebtoken');
 
 // =====================================
 // CONFIGURAÇÃO INICIAL
 // =====================================
 dotenv.config();
 
-const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Debug das configurações no terminal do Docker
@@ -25,8 +27,11 @@ console.log(`   DB_NAME: ${process.env.DB_NAME}`);
 // =====================================
 const app = express();
 
+// 🛡️ CRUCIAL: Confia no proxy do Nginx/Cloudflare para pegar o IP real do usuário no Rate Limiting
+app.set('trust proxy', 1);
+
 // =====================================
-// CONEXÃO COM BANCO (ATUALIZADO PARA O NOVO POOL DO DOCKER)
+// CONEXÃO COM BANCO (POOL DO MYSQL2)
 // =====================================
 const db = require('./config/db');
 
@@ -39,14 +44,16 @@ const statsRoutes = require('./routes/statsRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
 const pacotesRoutes = require('./routes/pacotesRoutes');
 
-
 // =====================================
-// MIDDLEWARES
+// MIDDLEWARES E CORS
 // =====================================
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
+  process.env.FRONTEND_URL,
+  'https://www.itagiclassificados.com',
+  'https://itagiclassificados.com',
+  'http://localhost:5173',
   'http://localhost:3000'
-];
+].filter(Boolean);
 
 app.use(cors({
   origin: allowedOrigins,
@@ -54,6 +61,25 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// ========================================================
+// PROTEÇÃO CONTRA FORÇA BRUTA (RATE LIMITING)
+// ========================================================
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // Janela de 15 minutos
+  max: 10,                  // Bloqueia após 10 tentativas por IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { 
+    error: 'Muitas tentativas de acesso a partir deste endereço. Por segurança, aguarde 15 minutos.' 
+  }
+});
+
+// Aplica a proteção em todas as possíveis rotas de login e cadastro
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/registro', authLimiter);
+app.use('/api/login', authLimiter);
+app.use('/api/registro', authLimiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -68,7 +94,6 @@ app.use((req, res, next) => {
 // =====================================
 // ROTAS DA API
 // =====================================
-
 if (categoriaRoutes && typeof categoriaRoutes === 'function') {
     app.use('/api/categorias', categoriaRoutes);
     console.log('✅ Rota /api/categorias carregada');
@@ -94,17 +119,14 @@ if (pacotesRoutes && typeof pacotesRoutes === 'function') {
     console.log('✅ Rota /api/pacotes carregada');
 }
 
-
-
 // =====================================
-// ROTA DE REGISTRO (AJUSTADA PARA MYSQL2/PROMISE)
+// ROTA DE REGISTRO
 // =====================================
 app.post('/api/registro', async (req, res) => {
   const { nome, email, senha, telefone, whatsapp_publico } = req.body;
   console.log('📝 Tentativa de registro:', email);
 
   try {
-    // [existingUser] desestrutura o retorno pegando apenas as linhas (rows)
     const [existingUser] = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
 
     if (existingUser.length > 0) {
@@ -112,8 +134,6 @@ app.post('/api/registro', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(senha, 10);
-
-    // 💡 Regra 3: Desestruturação utilizada no retorno do INSERT
 
     const [result] = await db.query(
       `INSERT INTO usuarios
@@ -141,7 +161,7 @@ app.post('/api/registro', async (req, res) => {
 });
 
 // =====================================
-// ROTA DE LOGIN (AJUSTADA PARA MYSQL2/PROMISE)
+// ROTA DE LOGIN
 // =====================================
 app.post('/api/login', async (req, res) => {
   const { email, senha } = req.body;
@@ -155,7 +175,6 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Email ou senha inválidos' });
     }
 
-    // 💡 Regra 2: Busca por apenas um registro utilizando índice [0] de forma segura
     const user = users[0];
     const senhaValida = await bcrypt.compare(senha, user.senha);
 
@@ -190,7 +209,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // =====================================
-// ROTA ESPECÍFICA PARA MEUS ANÚNCIOS (AJUSTADA PARA MYSQL2/PROMISE)
+// ROTA ESPECÍFICA PARA MEUS ANÚNCIOS
 // =====================================
 app.get('/api/meus-anuncios', async (req, res) => {
   console.log('🔍 Buscando meus anúncios...');
@@ -212,7 +231,6 @@ app.get('/api/meus-anuncios', async (req, res) => {
 
     console.log(`👤 Buscando anúncios do usuário ID: ${userId}`);
 
-    // 💡 Regra 5: Corrigido created_at para criado_em e removido JOIN de categoria_id que causava conflito
     const anunciosQuery = `
       SELECT a.*, a.categoria as categoria_nome
       FROM anuncios a
@@ -253,7 +271,6 @@ app.get('/api/status', (req, res) => {
 
 app.get('/api/test', async (req, res) => {
   try {
-    // 💡 Regra 2: Capturando a contagem em formato de registro único de agregação
     const [rows] = await db.query('SELECT COUNT(*) as total FROM usuarios');
     const usuarios = rows[0];
     res.json({ status: '✅ Conexão OK', total_usuarios: usuarios?.total || 0 });
@@ -261,16 +278,10 @@ app.get('/api/test', async (req, res) => {
     res.status(500).json({ error: 'Erro no banco', detalhes: error.message });
   }
 });
-// =====================================
-// SERVIR O FRONTEND REACT EM PRODUÇÃO
-// =====================================
 
 // =====================================
 // SERVIR O FRONTEND REACT EM PRODUÇÃO
 // =====================================
-const fs = require('fs');
-
-// Procura a pasta do React tanto na Dado Cloud quanto no ambiente local
 const possibleDistPaths = [
   '/usr/share/nginx/html',
   path.join(__dirname, '../frontend/dist'),

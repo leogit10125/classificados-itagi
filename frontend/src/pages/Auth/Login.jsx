@@ -11,8 +11,8 @@ function Login() {
 
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState("teste@teste.com");
-    const [senha, setSenha] = useState("123456");
+    const [email, setEmail] = useState("");
+    const [senha, setSenha] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -71,7 +71,7 @@ function Login() {
 
                 <h2>🔐 Login</h2>
 
-                <p>Use: teste@teste.com / 123456</p>
+                
 
                 {error && (
 
