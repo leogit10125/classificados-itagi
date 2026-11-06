@@ -1,3 +1,4 @@
+# 1. Compila o React
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
@@ -5,22 +6,25 @@ RUN npm ci --no-audit --no-fund --legacy-peer-deps
 COPY frontend/ ./
 RUN npm run build
 
-FROM node:20-alpine AS backend-builder
-WORKDIR /app/backend
-COPY backend/package*.json ./
-RUN npm ci --omit=dev --no-audit --no-fund
-COPY backend/ ./
-
+# 2. Prepara o Backend e junta com o React compilado
 FROM node:20-alpine
-RUN apk add --no-cache nginx
 WORKDIR /app
 
-COPY --from=backend-builder /app/backend ./backend
+COPY backend/package*.json ./backend/
+RUN cd backend && npm ci --omit=dev --no-audit --no-fund
+COPY backend/ ./backend/
+
+# Copia a pasta compilada do React direto para o backend servir
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
-COPY deploy/nginx.conf /etc/nginx/nginx.conf
-COPY deploy/start.sh /start.sh
 
-RUN chmod +x /start.sh
+# Garante permissões adequadas
+RUN chown -R node:node /app
 
+# 🛡️ SEGURANÇA MÁXIMA: Roda como usuário sem privilégios (não-root)
+USER node
+
+ENV NODE_ENV=production
+ENV PORT=8080
 EXPOSE 8080
-CMD ["/start.sh"]
+
+CMD ["node", "backend/server.js"]

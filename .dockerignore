@@ -1,8 +1,16 @@
 node_modules
+**/node_modules
 dist
+**/dist
 .vite
 .git
 .gitignore
-npm-debug.log**/.env
+npm-debug.log
+npm-debug.log*
+.env
+.env.*
+**/.env
 **/.env.*
 !**/.env.example
+uploads
+**/uploads

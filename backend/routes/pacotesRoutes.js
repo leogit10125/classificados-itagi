@@ -104,23 +104,29 @@ router.post('/webhook', async (req, res) => {
     const paymentId = data?.id || req.query['data.id'] || req.query.id;
 
     // Só processa se for notificação de pagamento
-    if (paymentId && (type === 'payment' || req.query.topic === 'payment')) {
-      const payment = new Payment(client);
-      const paymentInfo = await payment.get({ id: paymentId });
-
-      // Se o pagamento foi aprovado (Pix confirmado ou Cartão aprovado)
+    // Se o pagamento foi aprovado (Pix confirmado ou Cartão aprovado)
       if (paymentInfo.status === 'approved') {
         const usuarioId = paymentInfo.metadata.usuario_id;
         const creditos = paymentInfo.metadata.quantidade_creditos;
         const pagamentoIdInterno = paymentInfo.metadata.pagamento_id_interno;
 
-        // Atualiza status na tabela pagamentos para 'pago'
-        await db.query(
-          `UPDATE pagamentos SET status = 'pago' WHERE id = ?`,
+        // 🛡️ TRAVA DE IDEMPOTÊNCIA: Verifica se este pagamento JÁ FOI PROCESSADO antes!
+        const [pagamentoRows] = await db.query(
+          'SELECT status FROM pagamentos WHERE id = ?',
           [pagamentoIdInterno]
         );
 
-        // Adiciona os créditos ao usuário no MariaDB automaticamente!
+        if (pagamentoRows.length > 0 && pagamentoRows[0].status === 'pago') {
+          console.log(`⚠️ Pagamento #${paymentId} já foi processado anteriormente. Ignorando duplicata.`);
+          return res.sendStatus(200);
+        }
+
+        // Se ainda estava pendente, atualiza para 'pago' e credita o usuário uma única vez:
+        await db.query(
+          `UPDATE pagamentos SET status = 'pago', transacao_id = ? WHERE id = ?`,
+          [paymentId, pagamentoIdInterno]
+        );
+
         await db.query(
           `UPDATE usuarios SET pacote_anuncios = pacote_anuncios + ? WHERE id = ?`,
           [creditos, usuarioId]
@@ -128,7 +134,6 @@ router.post('/webhook', async (req, res) => {
 
         console.log(`✅ Pagamento #${paymentId} aprovado! ${creditos} créditos adicionados ao usuário #${usuarioId}`);
       }
-    }
 
     // Mercado Pago exige resposta 200 para confirmar que recebemos a notificação
     res.sendStatus(200);

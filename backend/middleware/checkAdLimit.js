@@ -1,15 +1,23 @@
 // backend/middleware/checkAdLimit.js
 const db = require('../config/db');
 
+// Pacotes oficiais sincronizados com o pacotesRoutes.js e Mercado Pago
+const PACOTES_DISPONIVEIS = [
+  { id: 1, nome: 'Básico', quantidade: 5, preco: 10.00, destaque: false },
+  { id: 2, nome: 'Popular', quantidade: 12, preco: 20.00, destaque: false },
+  { id: 3, nome: 'Destaque', quantidade: 30, preco: 40.00, destaque: true },
+  { id: 4, nome: 'Anúncio Avulso', quantidade: 1, preco: 2.00, destaque: false }
+];
+
 async function checkAdLimit(req, res, next) {
   try {
-    const usuarioId = req.usuario?.id;
+    const usuarioId = req.usuario?.id || req.user?.id;
     
     if (!usuarioId) {
-      return res.status(401).json({ error: 'Usuário não autenticado' });
+      return res.status(401).json({ error: 'Acesso não autorizado. Faça login para anunciar.' });
     }
 
-    // 💡 Regra 2: Espera apenas um registro (Desestruturando rows e pegando o índice [0])
+    // 1. Busca saldo de créditos do usuário
     const [userRows] = await db.query(
       `SELECT
           anuncios_gratuitos_restantes,
@@ -19,49 +27,44 @@ async function checkAdLimit(req, res, next) {
        WHERE id = ?`,
       [usuarioId]
     );
+
     const usuario = userRows[0];
 
     if (!usuario) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
+      return res.status(404).json({ error: 'Conta de usuário não encontrada.' });
     }
 
-    // 💡 Regra 2: Desestruturando agregação COUNT(*) do banco de dados
-    const [adRows] = await db.query(
-      'SELECT COUNT(*) as total FROM anuncios WHERE usuario_id = ?',
-      [usuarioId]
-    );
-    const anunciosCount = adRows[0];
+    // Conversão segura para garantir operações numéricas
+    const gratuitosRestantes = Number(usuario.anuncios_gratuitos_restantes) || 0;
+    const pacoteCreditos = Number(usuario.pacote_anuncios) || 0;
+    const anunciosPagos = Number(usuario.anuncios_pagos) || 0;
+    const totalPagosDisponiveis = pacoteCreditos + anunciosPagos;
 
-    const totalAnuncios = anunciosCount?.total || 0;
-    const gratuitosRestantes = usuario?.anuncios_gratuitos_restantes || 0;
-    const pagosDisponiveis = (usuario?.pacote_anuncios || 0) + (usuario?.anuncios_pagos || 0);
-    
-    // Verificar se pode criar anúncio baseado no saldo de anúncios gratuitos restantes
+    // 2. Validação de regras de negócio
     if (gratuitosRestantes > 0) {
-      // Ainda tem anúncio grátis disponível no saldo do usuário
+      // Prioridade 1: Consome os anúncios gratuitos de entrada
       req.adType = 'gratuito';
       return next();
-    } else if (pagosDisponiveis > 0) {
-      // Tem anúncios pagos disponíveis
+
+    } else if (totalPagosDisponiveis > 0) {
+      // Prioridade 2: Consome créditos adquiridos
       req.adType = 'pago';
       return next();
+
     } else {
-      // Sem créditos gratuitos ou pagos, barra a requisição retornando HTTP 402
+      // Bloqueio 402: Usuário precisa comprar créditos no Mercado Pago
       return res.status(402).json({ 
-        error: 'Limite de anúncios gratuitos atingido',
+        error: 'Limite de anúncios gratuitos atingido.',
         precisaPagar: true,
-        mensagem: 'Você já usou seus anúncios gratuitos. Adquira um pacote para continuar anunciando.',
-        pacotes: [
-          { id: 1, nome: 'Pacote Básico', quantidade: 5, preco: 10.00 },
-          { id: 2, nome: 'Pacote Popular', quantidade: 12, preco: 20.00 },
-          { id: 3, nome: 'Pacote Destaque', quantidade: 30, preco: 40.00 }
-        ]
+        mensagem: 'Você já utilizou seus 2 anúncios gratuitos. Adquira um pacote de créditos para continuar publicando.',
+        pacotes: PACOTES_DISPONIVEIS
       });
     }
 
   } catch (error) {
-    console.error('❌ Erro ao verificar limite:', error);
-    res.status(500).json({ error: 'Erro interno ao validar limite de anúncios', details: error.message });
+    console.error('❌ [LIMIT] Falha ao verificar limite de anúncios:', error.message);
+    // 🛡️ Segurança: não expõe detalhes de schema ou erros internos do banco ao cliente
+    return res.status(500).json({ error: 'Erro interno ao validar limite de publicação.' });
   }
 }
 

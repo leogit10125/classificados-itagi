@@ -89,27 +89,20 @@ router.get("/", async (req, res) => {
     try {
 
         const query = `
-
             SELECT
-
                 a.*,
-
                 u.nome AS usuario_nome,
-
-                u.telefone
-
+                CASE 
+                    WHEN u.whatsapp_publico = 1 THEN u.telefone 
+                    ELSE NULL 
+                END AS telefone,
+                u.whatsapp_publico
             FROM anuncios a
-
             LEFT JOIN usuarios u
-
                 ON u.id = a.usuario_id
-
-            WHERE a.status='active'
-
-            ORDER BY a.criado_em DESC
-
+            WHERE a.status = 'active'
+            ORDER BY a.destaque DESC, a.criado_em DESC
         `;
-
         const [rows] = await db.query(query);
 
         const anuncios = rows.map(ad => ({
@@ -436,6 +429,42 @@ router.post(
 
             } = req.body;
 
+            // ========================================================
+            // 🛡️ VALIDAÇÃO RIGOROSA DE ENTRADA (DEFESA CONTRA DADOS CORROMPIDOS)
+            // ========================================================
+            if (!titulo || typeof titulo !== 'string' || titulo.trim().length < 3) {
+                return res.status(400).json({ error: "O título deve ter pelo menos 3 caracteres." });
+            }
+
+            if (titulo.trim().length > 100) {
+                return res.status(400).json({ error: "O título pode ter no máximo 100 caracteres." });
+            }
+
+            if (!descricao || typeof descricao !== 'string' || descricao.trim().length < 5) {
+                return res.status(400).json({ error: "A descrição deve ter pelo menos 5 caracteres." });
+            }
+
+            if (descricao.trim().length > 3000) {
+                return res.status(400).json({ error: "A descrição pode ter no máximo 3000 caracteres." });
+            }
+
+            const precoNumerico = Number(preco);
+            if (isNaN(precoNumerico) || precoNumerico < 0) {
+                return res.status(400).json({ error: "Informe um preço válido (maior ou igual a zero)." });
+            }
+
+            if (precoNumerico > 99999999.99) {
+                return res.status(400).json({ error: "O valor informado excede o limite máximo permitido." });
+            }
+
+            if (!categoria || typeof categoria !== 'string' || categoria.trim() === '') {
+                return res.status(400).json({ error: "Selecione uma categoria válida para o anúncio." });
+            }
+
+            if (!localizacao || typeof localizacao !== 'string' || localizacao.trim() === '') {
+                return res.status(400).json({ error: "A localização do anúncio é obrigatória." });
+            }
+
             const adType = req.adType;
 
             let imagens = [];
@@ -473,27 +502,16 @@ router.post(
             `;
 
             const [result] = await db.query(
-
                 query,
-
                 [
-
-                    titulo,
-
-                    descricao,
-
-                    Number(preco),
-
-                    categoria,
-
-                    localizacao,
-
+                    titulo.trim(),
+                    descricao.trim(),
+                    precoNumerico,
+                    categoria.toLowerCase().trim(),
+                    localizacao.toLowerCase().trim(),
                     JSON.stringify(imagens),
-
                     usuarioId
-
                 ]
-
             );
 
             if (adType === "gratuito") {

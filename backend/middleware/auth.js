@@ -2,42 +2,70 @@
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET não configurado. Autenticação interrompida por segurança.');
-}
-
 module.exports = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  console.log('🔍 Auth - Header recebido:', authHeader ? 'Sim' : 'Não');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    console.log('❌ Token não fornecido');
-    return res.status(401).json({ error: 'Token não fornecido' });
+  const JWT_SECRET = process.env.JWT_SECRET;
+
+  // 🛡️ Trava de segurança: impede requisições se a chave mestra não estiver carregada
+  if (!JWT_SECRET) {
+    console.error('❌ [AUTH] Erro crítico: JWT_SECRET não configurado.');
+    return res.status(500).json({ error: 'Erro de configuração interna de autenticação.' });
   }
-  
+
+  const authHeader = req.headers.authorization;
+
+  // 1. Valida se o cabeçalho Authorization veio no padrão correto
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Acesso negado. Token não fornecido.' });
+  }
+
   const token = authHeader.split(' ')[1];
-  console.log('🔍 Token (primeiros 30 chars):', token.substring(0, 30) + '...');
-  
+
+  if (!token || token.trim() === '') {
+    return res.status(401).json({ error: 'Token de autenticação ausente ou malformado.' });
+  }
+
+  let decoded;
+
+  // 2. Validação criptográfica do JWT (Sem vazar erros para o cliente)
   try {
-    // Decodificar token JWT
-    const decoded = jwt.verify(token, JWT_SECRET);
-    console.log('✅ Token decodificado - ID:', decoded.id, 'Email:', decoded.email);
-    
-    // 💡 CORREÇÃO: Adicionado colchetes [users] para desestruturar as linhas no mysql2/promise
-    const [users] = await db.query('SELECT id, nome, email, telefone FROM usuarios WHERE id = ?', [decoded.id]);
-    
-    if (!users || users.length === 0) {
-      console.log('❌ Usuário não encontrado para ID:', decoded.id);
-      return res.status(401).json({ error: 'Usuário não encontrado' });
+    decoded = jwt.verify(token, JWT_SECRET);
+  } catch (jwtError) {
+    if (jwtError.name === 'TokenExpiredError') {
+      return res.status(401).json({ 
+        error: 'Sua sessão expirou. Por favor, faça login novamente.',
+        code: 'TOKEN_EXPIRED' 
+      });
     }
-    
-    req.usuario = users[0];
-    console.log('✅ Usuário autenticado:', req.usuario?.nome || 'Nome não encontrado');
+
+    // Token falsificado, malformado ou assinatura incorreta
+    return res.status(401).json({ 
+      error: 'Token de autenticação inválido.',
+      code: 'INVALID_TOKEN' 
+    });
+  }
+
+  // 3. Validação do usuário no Banco de Dados
+  try {
+    const [users] = await db.query(
+      'SELECT id, nome, email, telefone, role, anuncios_gratuitos_restantes, pacote_anuncios FROM usuarios WHERE id = ?',
+      [decoded.id]
+    );
+
+    if (!users || users.length === 0) {
+      return res.status(401).json({ error: 'Usuário associado a este token não foi encontrado.' });
+    }
+
+    const usuarioAutenticado = users[0];
+
+    // 🛡️ Disponibiliza o usuário nas duas formas mais comuns do Express
+    req.usuario = usuarioAutenticado;
+    req.user = usuarioAutenticado;
+
     next();
-    
-  } catch (error) {
-    console.error('❌ Erro no auth:', error.message);
-    res.status(401).json({ error: 'Token inválido: ' + error.message });
+
+  } catch (dbError) {
+    // 🛡️ Se o MariaDB falhar, o erro é 500 do servidor (e não 401 de token falso!)
+    console.error('❌ [AUTH] Falha ao consultar usuário no banco:', dbError.message);
+    return res.status(500).json({ error: 'Erro interno ao validar dados da sessão.' });
   }
 };
