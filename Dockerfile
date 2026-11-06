@@ -24,7 +24,7 @@ RUN chown -R node:node /app
 USER node
 
 ENV NODE_ENV=production
-ENV PORT=8080
-EXPOSE 8080
+ENV PORT=3000
+EXPOSE 3000
 
 CMD ["node", "backend/server.js"]
